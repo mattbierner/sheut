@@ -1,0 +1,21 @@
+/**
+ * @fileOverview
+ */
+package (
+    Debugger)
+with
+    import 'atum/debug/debuggable' debuggable
+in {
+
+/* Debugger
+ ******************************************************************************/
+Debugger = function(dgr, k, ctx, complete) {
+    this.dgr = dgr;
+    this.k = k;
+    this.ctx = ctx;
+    this.complete = complete;
+    this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
+};
+
+
+}

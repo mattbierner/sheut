@@ -1,0 +1,82 @@
+/**
+ * @fileOverview
+ */
+package (
+    step,
+    stepWhile,
+    finish,
+    stepOver,
+    stepOut,
+    run)
+with
+    import 'atum/compute' compute,
+    import 'atum/debug/debuggable' debuggable,
+    import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/value_reference' value_reference,
+    import 'atum/value/value' value,
+    import 'atum/value/type' type,
+    import 'sheut/state' {Debugger}
+in {
+
+
+
+/* Operations
+ ******************************************************************************/
+/**
+ * Perform a single step.
+ */
+step = \d -> {
+    if (d.complete)
+        return d;
+    
+    var next = compute.trampoline(d.k()());
+    if (next instanceof debuggable.Debuggable)
+        return new Debugger(next, next.k, next.ctx);
+    return next();
+};
+
+/**
+ * Step while `pred` is satisfied.
+ */
+stepWhile = \d, pred -> {
+    var next = d;
+    do {
+        next = step(next);
+    } while (pred(d, next));
+    return next;
+};
+
+/**
+ * Step to completion.
+ */
+finish = let
+    stepToCompletion = \current, next -> !next.complete
+in
+    \d -> stepWhile(d, stepToCompletion);
+
+/**
+ * Step over a function call.
+ */
+stepOver = let
+    step = \current, next ->
+        !next.complete && next.depth > current.depth
+in
+    \d -> stepWhile(d, stepOver);
+
+/**
+ * Step out of a function call.
+ */
+stepOut = let
+    stepOut = \current, next ->
+        !next.complete && next.depth >= current.depth
+in
+    \d -> stepWhile(d, stepOut);
+
+/**
+ * Run until a debugger statement is hit.
+ */
+run = \d ->
+    stepWhile(d, \current, next ->
+        !next.complete && !(next.dgr instanceof debuggable.DebuggerDebuggable));
+
+}

@@ -1,0 +1,77 @@
+/**
+ * @fileOverview
+ */
+package (
+    evaluate,
+    evaluateAst,
+    evaluateInput,
+    getValue)
+with
+    import 'ecma/parse/parser' parser,
+    import 'atum/compute' compute,
+    import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/value_reference' value_reference,
+    import 'atum/semantics/semantics' semantics,
+    import 'sheut/run' {debug},
+    import 'sheut/step' step
+in {
+
+var ret = \x -> \() -> x;
+var thr = \x -> \() -> { throw x; };
+
+/* Operations
+ ******************************************************************************/
+/**
+ * Evaluate `p` in the current context for `d`.
+ * 
+ * @param d Debugger providing compute context.
+ * @param p Computation.
+ * @param [ok] Success completion.
+ * @param [err] Failure completion.
+ */
+evaluate = \d, p, ok, err ->
+    step.finish(
+        debug(
+            p,
+            d.ctx,
+            (ok || ret),
+            (err || thr))).k;
+
+/**
+ * Evaluate an abstract syntax tree in the compute context from `d`.
+ * 
+ * @see evaluate
+ */
+evaluateAst = \d, root, ok, err ->
+    evaluate(
+        d,
+        semantics.programBody(
+            semantics.sourceElements(root.body)),
+        ok,
+        err);
+
+/**
+ * Evaluate a string in the compute context from `d`.
+ * 
+ * @see evaluate
+ */
+evaluateInput = \d, input, ok, err ->
+    evaluateAst(
+        d,
+        parser.parse(input),
+        ok,
+        err);
+
+/**
+ * Dereference `ref` in the compute context from `d`.
+ * 
+ * @see evaluate
+ */
+getValue = \d, ref, ok, err ->
+    evaluate(
+        value_reference.getFrom(
+            internal_reference.getValue(ref)),
+        ok,
+        err);
+
+}

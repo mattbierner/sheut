@@ -1,0 +1,102 @@
+/**
+ * @fileOverview
+ */
+package (
+    debug,
+    debugContext,
+    begin,
+    beginFromInput)
+with
+    import 'ecma/parse/parser' parser,
+    import 'atum/compute' compute,
+    import 'atum/debug/debuggable' debuggable,
+    import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/value_reference' value_reference,
+    import 'atum/interpret' interpret,
+    import 'atum/semantics/semantics' semantics,
+    import 'atum/builtin/impl/global' global,
+    import 'sheut/state' {Debugger}
+in {
+
+var ret = \x -> \() -> x;
+var thr = \x -> \() -> { throw x; };
+    
+var globalCtx = interpret.complete(
+    compute.sequence(
+        global.enterGlobal(),
+        global.initialize(),
+        compute.computeContext),
+    compute.ComputeContext.empty,
+    \x -> \() -> x,
+    \x -> \() -> x);
+
+/* Operations
+ ******************************************************************************/
+/**
+ * Debug an existing computation.
+ * 
+ * @param p Computation.
+ * @param ctx Computation context.
+ * @param ok Success callback.
+ * @param err Error callback.
+ * 
+ * @return Debugger object.
+ */
+debug = \p, ctx, ok, err -> let
+    pok = \x, ctx ->
+        let c = ok(x, ctx) in \() -> new Debugger(null, c(), ctx, true),
+    perr = \x, ctx ->
+        let c = err(x, ctx) in \() -> new Debugger(null, c(), ctx, true)
+in
+    new Debugger(
+        null,
+        \() -> \() -> p(ctx, pok, perr),
+        ctx,
+        false);
+
+/**
+ * Start debugging a program for a given context.
+ * 
+ * @param root Root the the program's AST.
+ * @param state Computation context.
+ * @param [ok] Success callback.
+ * @param [err] Error callback.
+ * 
+ * @return Debugger object.
+ */
+debugContext = \root, ctx, ok, err ->
+    debug(
+        semantics.programBody(semantics.sourceElements(root.body)),
+        ctx,
+        (ok || ret),
+        (err || thr));
+
+/**
+ * Start debugging a program in the global context.
+ * 
+ * @see beginContext
+ */
+begin = \ast, ok, err ->
+    debugContext(
+        ast,
+        globalCtx,
+        ok,
+        err);
+
+/**
+ * Parse a program and start debugging it in the global context.
+ * 
+ * Throws if the parsing fails. Otherwise, returns all computation results
+ * though success and error completions.
+ * 
+ * @param {String} text Input string.
+ * 
+ * @see begin.
+ */
+beginFromInput = \text, ok, err ->
+    begin(
+        parser.parse(text),
+        ok,
+        err);
+
+}

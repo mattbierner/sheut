@@ -1,0 +1,21 @@
+[submodule "dependencies/atum"]
+	path = dependencies/atum
+	url = https://github.com/mattbierner/atum
+[submodule "dependencies/parse"]
+	path = dependencies/parse
+	url = https://github.com/mattbierner/parse.js
+[submodule "dependencies/nu"]
+	path = dependencies/nu
+	url = https://github.com/mattbierner/nu
+[submodule "dependencies/parse-ecma"]
+	path = dependencies/parse-ecma
+	url = https://github.com/mattbierner/parse-ecma
+[submodule "dependencies/ecma-ast"]
+	path = dependencies/ecma-ast
+	url = https://github.com/mattbierner/ecma-ast
+[submodule "dependencies/seshat"]
+	path = dependencies/seshat
+	url = https://github.com/mattbierner/seshat
+[submodule "dependencies/amulet"]
+	path = dependencies/amulet
+	url = https://github.com/mattbierner/amulet
