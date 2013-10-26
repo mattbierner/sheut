@@ -10,6 +10,7 @@ package (
     run)
 with
     import 'atum/compute' compute,
+    import 'atum/compute/tail' tail,
     import 'atum/debug/debuggable' debuggable,
     import 'atum/operations/internal_reference' internal_reference,
     import 'atum/operations/value_reference' value_reference,
@@ -29,10 +30,10 @@ step = \d -> {
     if (d.complete)
         return d;
     
-    var next = compute.trampoline(d.k()());
-    if (next instanceof debuggable.Debuggable)
-        return new Debugger(next, next.k, next.ctx);
-    return next();
+    var next = tail.trampoline(d.k(null, d.ctx));
+    return (next instanceof debuggable.Debuggable ?
+        new Debugger(next, next.k, next.ctx) :
+        next);
 };
 
 /**

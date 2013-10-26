@@ -9,26 +9,28 @@ package (
 with
     import 'ecma/parse/parser' parser,
     import 'atum/compute' compute,
+    import 'atum/compute/context' context,
     import 'atum/debug/debuggable' debuggable,
     import 'atum/operations/internal_reference' internal_reference,
     import 'atum/operations/value_reference' value_reference,
     import 'atum/interpret' interpret,
     import 'atum/semantics/semantics' semantics,
     import 'atum/builtin/impl/global' global,
+    import 'atum/builtin/operations/global' globalOps,
     import 'sheut/state' {Debugger}
 in {
 
-var ret = \x -> \() -> x;
-var thr = \x -> \() -> { throw x; };
+var ret = \x -> x;
+var thr = \x -> { throw x; };
     
 var globalCtx = interpret.complete(
     compute.sequence(
-        global.enterGlobal(),
         global.initialize(),
+        globalOps.enterGlobal(),
         compute.computeContext),
-    compute.ComputeContext.empty,
-    \x -> \() -> x,
-    \x -> \() -> x);
+    context.ComputeContext.empty,
+    ret,
+    thr);
 
 /* Operations
  ******************************************************************************/
@@ -44,13 +46,13 @@ var globalCtx = interpret.complete(
  */
 debug = \p, ctx, ok, err -> let
     pok = \x, ctx ->
-        let c = ok(x, ctx) in \() -> new Debugger(null, c(), ctx, true),
+        new Debugger(null, ok(x, ctx), ctx, true),
     perr = \x, ctx ->
-        let c = err(x, ctx) in \() -> new Debugger(null, c(), ctx, true)
+        new Debugger(null, err(x, ctx), ctx, true)
 in
     new Debugger(
         null,
-        \() -> \() -> p(ctx, pok, perr),
+        \() -> interpret.exec(p, ctx, pok, perr),
         ctx,
         false);
 
@@ -66,7 +68,8 @@ in
  */
 debugContext = \root, ctx, ok, err ->
     debug(
-        semantics.programBody(semantics.sourceElements(root.body)),
+        semantics.programBody(
+            semantics.sourceElements(root.body)),
         ctx,
         (ok || ret),
         (err || thr));

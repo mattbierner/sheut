@@ -16,8 +16,8 @@ with
     import 'sheut/step' step
 in {
 
-var ret = \x -> \() -> x;
-var thr = \x -> \() -> { throw x; };
+var ret = \x -> x;
+var thr = \x -> { throw x; };
 
 /* Operations
  ******************************************************************************/
