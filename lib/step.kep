@@ -19,65 +19,124 @@ with
     import 'sheut/state' {Debugger}
 in {
 
+var foldl = \f, z, a -> Array.prototype.reduce.call(a, f, z);
 
+var args = \args() -> args;
 
-/* Operations
+var constant = \x -> \() -> x;
+
+/* Basic Policies
+ ******************************************************************************/
+var always = constant(true);
+
+var never = constant(false);
+
+var notComplete = \current, next -> !next.complete;
+
+/* Policies
+ ******************************************************************************/
+var testDepth = \pred ->
+    \current, next ->
+        pred(next.depth, current.depth);
+
+var depthGt = testDepth((>));
+
+var depthLte = testDepth((<=));
+
+var testDgr = \pred ->
+    \_, next ->
+        pred(next.dgr);
+
+/* Policy Combinators
+ ******************************************************************************/
+var not = \p -> (p \> (!));
+
+/**
+ * 
+ */
+var binary = \f ->
+    \a, b ->
+        \current, next ->
+            f(a(current, next), b(current, next));
+    
+/**
+ * Are two policies both satisfied?
+ */
+var and = binary((&&));
+
+/**
+ * Are either of two policies satisfied.
+ */
+var or = binary((||));
+
+/**
+ * Are all of the policies, passed as arguments, satisfied.
+ */
+var all = args \> (foldl, and, always);
+
+/**
+ * Are any of the policies, passed as arguments, satisfied.
+ */
+var any = args \> (foldl, or, never);
+
+/* Stepping Operations
  ******************************************************************************/
 /**
- * Perform a single step.
+ * Perform a single step without any policy.
+ * 
+ * @param d Debugger state.
  */
-step = \d -> {
-    if (d.complete)
-        return d;
-    
-    var next = tail.trampoline(d.k(null, d.ctx));
-    return (next instanceof debuggable.Debuggable ?
-        new Debugger(next, next.k, next.ctx) :
-        next);
-};
+step = \d ->
+    (d.complete ? d :
+        let next = tail.trampoline(d.k(null, d.ctx)) in
+            (next instanceof debuggable.Debuggable ?
+                new Debugger(next, next.k, next.ctx) :
+                next));
 
 /**
- * Step while `pred` is satisfied.
+ * Step while `policy` is satisfied.
+ * 
+ * @param policy Binary predicate taking current and next state that determines
+ *    when to stop stepping.
+ * @param d Debugger state.
  */
-stepWhile = \d, pred -> {
+stepWhile = \policy, d -> {
     var next = d;
     do {
         next = step(next);
-    } while (pred(d, next));
+    } while (policy(d, next));
     return next;
 };
 
 /**
  * Step to completion.
  */
-finish = let
-    stepToCompletion = \current, next -> !next.complete
-in
-    \d -> stepWhile(d, stepToCompletion);
+finish = (stepWhile,
+    notComplete);
 
 /**
  * Step over a function call.
  */
-stepOver = let
-    step = \current, next ->
-        !next.complete && next.depth > current.depth
-in
-    \d -> stepWhile(d, stepOver);
+stepOver = (stepWhile,
+    and(
+        notComplete,
+        depthGt));
 
 /**
  * Step out of a function call.
  */
-stepOut = let
-    stepOut = \current, next ->
-        !next.complete && next.depth >= current.depth
-in
-    \d -> stepWhile(d, stepOut);
+stepOut = (stepWhile,
+    and(
+        notComplete,
+        depthLte));
 
 /**
  * Run until a debugger statement is hit.
  */
-run = \d ->
-    stepWhile(d, \current, next ->
-        !next.complete && !(next.dgr instanceof debuggable.DebuggerDebuggable));
+run = (stepWhile,
+    and(
+        notComplete,
+        not(
+            testDgr(\dgr -> dgr instanceof debuggable.DebuggerDebuggable))));
 
 }
