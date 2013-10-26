@@ -45,6 +45,30 @@ function(run, step, operations){
                     operations.execute(d3, operations.evaluateInput("b")).value,
                     4);
             }],
+            
+            ["Step over",
+            function(){
+                var d = run.beginFromInput("function f(){ var x = 3; return x; }; var x = 0; debugger; x = f(); x = 5; debugger;");
+                d = step.run(d);
+                assert.equal(
+                    operations.execute(d, operations.evaluateInput("typeof x")).value,
+                    'number');
+                assert.equal(
+                    operations.execute(d, operations.evaluateInput("x")).value,
+                    0);
+                assert.equal(
+                    operations.execute(d, operations.stack).length,
+                    0);
+                    
+                var d1 = step.step(step.stepOver(step.step(step.step(d))));
+                assert.equal(
+                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    3);
+                assert.equal(
+                    operations.execute(d1, operations.stack).length,
+                    0);
+
+            }],
         ],
     };
 });

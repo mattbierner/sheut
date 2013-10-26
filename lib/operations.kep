@@ -10,11 +10,17 @@ package (
 
 // Operations
     getFrom,
-    getValue)
+    getValue,
+    
+// Execution Context
+    context,
+    location,
+    stack)
 with
     import 'ecma/parse/parser' {parse},
     import 'atum/compute' {always},
     import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/execution_context' execution_context,
     import 'atum/operations/value_reference' value_reference,
     import 'atum/semantics/semantics' {programBody, sourceElements},
     import 'sheut/run' {debug},
@@ -76,5 +82,23 @@ getValue = always \> getFrom;
 
 /* State
  ******************************************************************************/
+var _extractMetadata = \f ->
+    execution_context.extract(\ctx ->
+        f(ctx.metadata));
+
+/**
+ * Get the execution context.
+ */
+context = execution_context.context;
+
+/**
+ * Get the current location.
+ */
+location = _extractMetadata(\m -> m.location);
+
+/**
+ * Get the current stack.
+ */
+stack = _extractMetadata(\m -> m.stack);
 
 }
