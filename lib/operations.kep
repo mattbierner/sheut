@@ -2,24 +2,29 @@
  * @fileOverview
  */
 package (
-    evaluate,
+    execute,
+    
+// Evaluation
     evaluateAst,
     evaluateInput,
+
+// Operations
+    getFrom,
     getValue)
 with
-    import 'ecma/parse/parser' parser,
-    import 'atum/compute' compute,
+    import 'ecma/parse/parser' {parse},
+    import 'atum/compute' {always},
     import 'atum/operations/internal_reference' internal_reference,
     import 'atum/operations/value_reference' value_reference,
-    import 'atum/semantics/semantics' semantics,
+    import 'atum/semantics/semantics' {programBody, sourceElements},
     import 'sheut/run' {debug},
-    import 'sheut/step' step
+    import 'sheut/step' {finish}
 in {
 
 var ret = \x -> x;
 var thr = \x -> { throw x; };
 
-/* Operations
+/* Execute
  ******************************************************************************/
 /**
  * Evaluate `p` in the current context for `d`.
@@ -29,49 +34,47 @@ var thr = \x -> { throw x; };
  * @param [ok] Success completion.
  * @param [err] Failure completion.
  */
-evaluate = \d, p, ok, err ->
-    step.finish(
+execute = \d, p, ok, err ->
+    finish(
         debug(
             p,
             d.ctx,
             (ok || ret),
             (err || thr))).k;
 
+/* Evaluation
+ ******************************************************************************/
 /**
  * Evaluate an abstract syntax tree in the compute context from `d`.
- * 
- * @see evaluate
  */
-evaluateAst = \d, root, ok, err ->
-    evaluate(
-        d,
-        semantics.programBody(
-            semantics.sourceElements(root.body)),
-        ok,
-        err);
+evaluateAst = \root ->
+    programBody(
+        sourceElements(root.body));
 
 /**
  * Evaluate a string in the compute context from `d`.
  * 
  * @see evaluate
  */
-evaluateInput = \d, input, ok, err ->
-    evaluateAst(
-        d,
-        parser.parse(input),
-        ok,
-        err);
+evaluateInput = parse \> evaluateAst;
+
+/* Operations
+ ******************************************************************************/
+/**
+ * Dereference the result of `p` in the compute context from `d`.
+ * 
+ * @see evaluate
+ */
+getFrom = internal_reference.getFrom \> value_reference.getFrom;
 
 /**
  * Dereference `ref` in the compute context from `d`.
  * 
  * @see evaluate
  */
-getValue = \d, ref, ok, err ->
-    evaluate(
-        value_reference.getFrom(
-            internal_reference.getValue(ref)),
-        ok,
-        err);
+getValue = always \> getFrom;
+
+/* State
+ ******************************************************************************/
 
 }
