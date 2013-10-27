@@ -2,12 +2,12 @@
  * @fileOverview
  */
 package (
-    Breakpoint,
-    )
+    Breakpoint)
 with
     import 'amulet/record' record,
-    import 'atum/debug/debuggable' debuggable.
-    import 'atum/operations/type_conversion' {toBoolean}
+    import 'atum/debug/debuggable' debuggable,
+    import 'atum/operations/type_conversion' {toBoolean},
+    import 'sheut/operations' operations
 in {
 
 /* Breakpoint
@@ -25,7 +25,7 @@ var createUnconditionalBreakpoint = \id, loc ->
             \currentLocation ->
                 (currentLocation && loc.compare(currentLocation) === 0),
             \_ ->
-                false);
+                false));
 
 /* Conditional Breakpoint
  ******************************************************************************/
@@ -33,9 +33,9 @@ var createConditionalBreakpoint = \id, expression ->
     new Breakpoint(
         id,
         \d -> operations.execute(d, toBoolean(expression),
-            \currentLocation ->
+            \result ->
                 result && result.value,
             \_ ->
-                false);
+                false));
 
 }

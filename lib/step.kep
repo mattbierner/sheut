@@ -3,11 +3,13 @@
  */
 package (
 // Operations
+    next,
+    
     step,
     finish,
+    run,
     stepOver,
-    stepOut,
-    run)
+    stepOut)
 with
     import 'atum/compute' compute,
     import 'atum/compute/tail' {trampoline},
@@ -18,6 +20,8 @@ with
 in {
 
 var foldl = \f, z, a -> Array.prototype.reduce.call(a, f, z);
+
+var map = \f, a -> Array.prototype.map.call(a, f);
 
 var args = \args() -> args;
 
@@ -86,12 +90,11 @@ var any = args \> anya;
 
 /* Breakpoint Policies
  ******************************************************************************/
-var breakpoint = \current, next -> {
-    for (var i = 0; i < current.breakpoints.length; ++i)
-        if (current.breakpoints[i].test(next))
-            return true;
-    return false;
-};
+var breakpoint = \current{breakpoints}, next ->
+    anya(
+        map(
+            \b -> b.test(next),
+            breakpoints));
 
 /* Policies
  ******************************************************************************/
@@ -121,11 +124,13 @@ var callDgr = or(
 /* Basic Operations
  ******************************************************************************/
 /**
- * Perform a single step without any policy.
+ * Perform a single step to the next debuggable in the program.
+ * 
+ * Does not have any stepping policy.
  * 
  * @param d Debugger.
  */
-var next = let
+next = let
     next = \s ->
         (s.complete ? s :
             let c = trampoline(s.k(null, s.ctx)) in
@@ -155,6 +160,8 @@ var nextWhile = \policy, d -> {
  ******************************************************************************/
 /**
  * Perform a single step to the next statement in the program.
+ * 
+ * This will hit whatever the next statement is, including inside functions.
  */
 step = (nextWhile,
     and(
@@ -171,13 +178,16 @@ finish = (nextWhile,
  * Run until a debugger statement or breakpoint is hit.
  */
 run = (nextWhile,
-    and(
+    all(
         notComplete,
         not(debuggerDgr),
         breakpoint));
 
 /**
  * Step over a function call.
+ * 
+ * Will also stop for breakpoints and debugger statements even if these occur
+ * inside of the stepped over function.
  */
 stepOver = (nextWhile,
     all(
@@ -187,6 +197,9 @@ stepOver = (nextWhile,
 
 /**
  * Step out of a function call.
+ * 
+ * Will also stop for breakpoints and debugger statements even if these occur
+ * inside of the stepped over function.
  */
 stepOut = (nextWhile,
     and(

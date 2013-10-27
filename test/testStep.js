@@ -77,6 +77,33 @@ function(run,
                     operations.execute(d3, operations.evaluateInput("b")).value,
                     4);
             }],
+            ["Step goes into and out of functions",
+            function(){
+                var d = run.beginFromInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5; debugger;");
+                d = step.run(d);
+                assert.equal(
+                    operations.execute(d, operations.evaluateInput("typeof x")).value,
+                    'number');
+                assert.equal(
+                    operations.execute(d, operations.evaluateInput("x")).value,
+                    0);
+                assert.equal(
+                    operations.execute(d, operations.stack).length,
+                    0);
+                    
+                var d1 = step.step(step.step(d));
+                assert.equal(
+                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    3);
+                assert.equal(
+                    operations.execute(d1, operations.stack).length,
+                    1);
+                
+                var d2 = step.step(d1);
+                assert.equal(
+                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    6);
+            }],
             
             ["Step over",
             function(){
