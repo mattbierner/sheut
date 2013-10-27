@@ -96,8 +96,8 @@ var breakpoint = \current, next -> {
 /* Policies
  ******************************************************************************/
 var testDepth = \pred ->
-    \current, next ->
-        pred(next.debug.depth, current.debug.depth);
+    \current, next -> 
+        pred(current.debug.depth, next.debug.depth);
 
 var depthGt = testDepth((>));
 
@@ -183,7 +183,7 @@ stepOver = (nextWhile,
     all(
         notComplete,
         depthGt,
-        not(dgrInstanceof(debuggable.PostCallDebuggable))));
+        not(statementDgr)));
 
 /**
  * Step out of a function call.
