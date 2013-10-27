@@ -2,20 +2,68 @@
  * @fileOverview
  */
 package (
-    Debugger)
+    DebugState,
+    Debugger,
+    
+    isComplete,
+    addBreakpoint)
 with
-    import 'atum/debug/debuggable' debuggable
+    import 'amulet/record' record
 in {
+
+var concat = Function.prototype.call.bind(Array.prototype.concat);
+
+/* DebugState
+ ******************************************************************************/
+/**
+ * State of debug session.
+ */
+DebugState = record.declare(null, [
+    'dgr',
+    'k',
+    'ctx',
+    'complete',
+    'depth'],
+    function(dgr, k, ctx, complete) {
+        this.dgr = dgr;
+        this.k = k;
+        this.ctx = ctx;
+        this.complete = complete;
+        this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
+    });
 
 /* Debugger
  ******************************************************************************/
-Debugger = function(dgr, k, ctx, complete) {
-    this.dgr = dgr;
-    this.k = k;
-    this.ctx = ctx;
-    this.complete = complete;
-    this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
-};
+/**
+ * State of a debugger object.
+ */
+Debugger = record.declare(null, [
+    'debug',
+    'breakpoints']);
 
+/* Operations
+ ******************************************************************************/
+/**
+ * 
+ */
+isComplete = \d ->
+    (d.debug && d.debug.complete);
+    
+/**
+ * 
+ */
+getValue = \d ->
+    (d.debug && d.debug.complete ?
+        d.debug.k :
+        null);
+
+/**
+ * 
+ */
+addBreakpoint = \d, breakpoint ->
+    d.setBreakpoints(
+        concat(
+            d.breakpoints,
+            breakpoint));
 
 }

@@ -35,7 +35,7 @@ var thr = \x -> { throw x; };
 /**
  * Evaluate `p` in the current context for `d`.
  * 
- * @param d Debugger providing compute context.
+ * @param d Debugger state.
  * @param p Computation.
  * @param [ok] Success completion.
  * @param [err] Failure completion.
@@ -44,9 +44,9 @@ execute = \d, p, ok, err ->
     finish(
         debug(
             p,
-            d.ctx,
+            d.debug.ctx,
             (ok || ret),
-            (err || thr))).k;
+            (err || thr))).debug.k;
 
 /* Evaluation
  ******************************************************************************/

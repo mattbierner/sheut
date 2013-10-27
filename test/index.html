@@ -30,7 +30,9 @@
             }
         });
         require(
-            ['testCreate'],
+            ['testCreate',
+            'testStep',
+            'testBreakpoint'],
             function() {
                 Array.prototype.forEach.call(arguments, function(m) {
                     m.module && module(m.module);

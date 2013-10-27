@@ -2,21 +2,19 @@
  * @fileOverview
  */
 package (
+// Operations
     step,
-    stepWhile,
     finish,
     stepOver,
     stepOut,
     run)
 with
     import 'atum/compute' compute,
-    import 'atum/compute/tail' tail,
+    import 'atum/compute/tail' {trampoline},
     import 'atum/debug/debuggable' debuggable,
     import 'atum/operations/internal_reference' internal_reference,
     import 'atum/operations/value_reference' value_reference,
-    import 'atum/value/value' value,
-    import 'atum/value/type' type,
-    import 'sheut/state' {Debugger}
+    import 'sheut/state' {DebugState, Debugger}
 in {
 
 var foldl = \f, z, a -> Array.prototype.reduce.call(a, f, z);
@@ -31,21 +29,11 @@ var always = constant(true);
 
 var never = constant(false);
 
-var notComplete = \current, next -> !next.complete;
-
-/* Policies
- ******************************************************************************/
-var testDepth = \pred ->
-    \current, next ->
-        pred(next.depth, current.depth);
-
-var depthGt = testDepth((>));
-
-var depthLte = testDepth((<=));
-
-var testDgr = \pred ->
+var testNext = \f ->
     \_, next ->
-        pred(next.dgr);
+        f(next.debug);
+
+var notComplete = testNext(\d -> !d.complete);
 
 /* Policy Combinators
  ******************************************************************************/
@@ -73,73 +61,136 @@ var and = binary((&&));
 var or = binary((||));
 
 /**
+ * Are all of the policies satisfied.
+ * 
+ * @param arr Array of policies
+ */
+var alla = (foldl, and, always);
+
+/**
  * Are all of the policies, passed as arguments, satisfied.
  */
-var all = args \> (foldl, and, always);
+var all = args \> alla;
+
+/**
+ * Are any of the policies satisfied.
+ * 
+ * @param arr Array of policies.
+ */
+var anya = (foldl, or, never);
 
 /**
  * Are any of the policies, passed as arguments, satisfied.
  */
-var any = args \> (foldl, or, never);
+var any = args \> anya;
 
-/* Stepping Operations
+/* Breakpoint Policies
+ ******************************************************************************/
+var breakpoint = \current, next -> {
+    for (var i = 0; i < current.breakpoints.length; ++i)
+        if (current.breakpoints[i].test(next))
+            return true;
+    return false;
+};
+
+/* Policies
+ ******************************************************************************/
+var testDepth = \pred ->
+    \current, next ->
+        pred(next.debug.depth, current.debug.depth);
+
+var depthGt = testDepth((>));
+
+var depthLte = testDepth((<=));
+
+var testDgr = \pred ->
+    \_, next ->
+        pred(next.debug.dgr);
+
+var dgrInstanceof = \kind ->
+    testDgr(\dgr -> dgr instanceof kind);
+
+var debuggerDgr = dgrInstanceof(debuggable.DebuggerDebuggable);
+
+var statementDgr = dgrInstanceof(debuggable.StatementDebuggable);
+
+var callDgr = or(
+    dgrInstanceof(debuggable.PreCallDebuggable),
+    dgrInstanceof(debuggable.PostCallDebuggable));
+
+/* Basic Operations
  ******************************************************************************/
 /**
  * Perform a single step without any policy.
  * 
- * @param d Debugger state.
+ * @param d Debugger.
  */
-step = \d ->
-    (d.complete ? d :
-        let next = tail.trampoline(d.k(null, d.ctx)) in
-            (next instanceof debuggable.Debuggable ?
-                new Debugger(next, next.k, next.ctx) :
-                next));
+var next = let
+    next = \s ->
+        (s.complete ? s :
+            let c = trampoline(s.k(null, s.ctx)) in
+                (c instanceof debuggable.Debuggable ?
+                    DebugState.create(c, c.k, c.ctx) :
+                    c))
+in
+    \d ->
+        d.setDebug(next(d.debug));
 
 /**
  * Step while `policy` is satisfied.
  * 
  * @param policy Binary predicate taking current and next state that determines
  *    when to stop stepping.
- * @param d Debugger state.
+ * @param d Debugger.
  */
-stepWhile = \policy, d -> {
-    var next = d;
+var nextWhile = \policy, d -> {
+    var c = d;
     do {
-        next = step(next);
-    } while (policy(d, next));
-    return next;
+        c = next(c);
+    } while (policy(d, c));
+    return c;
 };
+
+/* Stepping Operations
+ ******************************************************************************/
+/**
+ * Perform a single step to the next statement in the program.
+ */
+step = (nextWhile,
+    and(
+        notComplete,
+        not(statementDgr)));
 
 /**
  * Step to completion.
  */
-finish = (stepWhile,
+finish = (nextWhile,
     notComplete);
+
+/**
+ * Run until a debugger statement or breakpoint is hit.
+ */
+run = (nextWhile,
+    and(
+        notComplete,
+        not(debuggerDgr),
+        breakpoint));
 
 /**
  * Step over a function call.
  */
-stepOver = (stepWhile,
-    and(
+stepOver = (nextWhile,
+    all(
         notComplete,
-        depthGt));
+        depthGt,
+        not(dgrInstanceof(debuggable.PostCallDebuggable))));
 
 /**
  * Step out of a function call.
  */
-stepOut = (stepWhile,
+stepOut = (nextWhile,
     and(
         notComplete,
         depthLte));
-
-/**
- * Run until a debugger statement is hit.
- */
-run = (stepWhile,
-    and(
-        notComplete,
-        not(
-            testDgr(\dgr -> dgr instanceof debuggable.DebuggerDebuggable))));
 
 }
