@@ -104,7 +104,8 @@ function(run,
                     operations.execute(d2, operations.evaluateInput("x")).value,
                     6);
             }],
-            
+        
+        // Step over
             ["Step over",
             function(){
                 var d = step.run(run.beginFromInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
@@ -151,6 +152,41 @@ function(run,
                 assert.equal(
                     operations.execute(d1, operations.stack).length,
                     1);
+            }],
+        
+        // Step out
+            ["Step out",
+            function(){
+                var d = step.run(run.beginFromInput("function f(x){ return (x > 5 ? x : f(x + 1)); }; var x = 0; debugger; x = f(0); x = 5;"));
+                    
+                var d1 = step.sequence(step.step, step.step, step.step, step.step)(d); // 3 calls
+                assert.equal(
+                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    2);
+                assert.equal(
+                    operations.execute(d1, operations.stack).length,
+                    3);
+                
+                var d2 = step.stepOut(d1);
+                assert.equal(
+                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    1);
+               assert.equal(
+                    operations.execute(d2, operations.stack).length,
+                    2);
+               
+                var d3 = step.sequence(step.stepOut, step.stepOut)(d2);
+                assert.equal(
+                    operations.execute(d3, operations.evaluateInput("x")).value,
+                    0);
+               assert.equal(
+                    operations.execute(d3, operations.stack).length,
+                    0);
+               
+                var d4 = step.step(d3);
+                assert.equal(
+                    operations.execute(d4, operations.evaluateInput("x")).value,
+                    6);
             }],
         ],
     };

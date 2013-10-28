@@ -102,7 +102,7 @@ var breakpoint = \current{breakpoints}, next ->
             \b -> b.test(next),
             breakpoints));
 
-/* Policies
+/* Depth Policies
  ******************************************************************************/
 var testDepth = \pred ->
     \current, next -> 
@@ -110,8 +110,10 @@ var testDepth = \pred ->
 
 var depthGt = testDepth((<));
 
-var depthLte = testDepth((>=));
+var depthGte = testDepth((<=));
 
+/* Kind Policies
+ ******************************************************************************/
 var testDgr = \pred ->
     \_, next ->
         pred(next.debug.dgr);
@@ -212,9 +214,10 @@ stepOver = (nextWhile,
  * inside of the stepped over function.
  */
 stepOut = (nextWhile,
-    and(
+    all(
         notComplete,
-        depthLte));
+        depthGte,
+        not(debuggerDgr)));
 
 /* Step Combinators
  ******************************************************************************/
