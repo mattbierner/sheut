@@ -102,7 +102,7 @@ var any = args \> anya;
 var breakpoint = \current{breakpoints}, next ->
     anya(
         map(
-            \b -> testNext(b.test.bind(b)),
+            \b -> b.test.bind(b),
             breakpoints))(current, next);
 
 /* Depth Policies

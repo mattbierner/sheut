@@ -29,9 +29,12 @@ Breakpoint = record.declare(null, [
 createUnconditional = \id, line ->
     Breakpoint.create(
         id,
-        \d -> operations.executeContext(d, operations.location,
+        \current, next -> operations.execute(current, operations.location,
             \currentLocation ->
-                (currentLocation && currentLocation.start.line === line),
+                operations.execute(next, operations.location,
+                    \nextLocation -> 
+                        ((!currentLocation || currentLocation.start.line !== line) &&nextLocation && nextLocation.start.line === line),
+                    \_ -> false),
             \_ -> false));
 
 /* Conditional Breakpoint
@@ -41,7 +44,7 @@ createConditional = \id, prog -> let
 in
     Breakpoint.create(
         id,
-        \d -> operations.executeContext(d, condition,
+        \_, next -> operations.execute(next, condition,
             \result -> result,
             \_ -> false));
 
