@@ -9,7 +9,11 @@ package (
     finish,
     run,
     stepOver,
-    stepOut)
+    stepOut,
+    
+// Step Combinators
+    sequencea,
+    sequence)
 with
     import 'atum/compute' compute,
     import 'atum/compute/tail' {trampoline},
@@ -20,10 +24,12 @@ with
 in {
 
 var foldl = \f, z, a -> Array.prototype.reduce.call(a, f, z);
-
+var foldr = \f, z, a -> Array.prototype.reduceRight.call(a, f, z);
 var map = \f, a -> Array.prototype.map.call(a, f);
 
 var args = \args() -> args;
+
+var identity = \x -> x;
 
 var constant = \x -> \() -> x;
 
@@ -102,9 +108,9 @@ var testDepth = \pred ->
     \current, next -> 
         pred(current.debug.depth, next.debug.depth);
 
-var depthGt = testDepth((>));
+var depthGt = testDepth((<));
 
-var depthLte = testDepth((<=));
+var depthLte = testDepth((>=));
 
 var testDgr = \pred ->
     \_, next ->
@@ -158,6 +164,8 @@ var nextWhile = \policy, d -> {
 
 /* Stepping Operations
  ******************************************************************************/
+var stepNone = identity;
+
 /**
  * Perform a single step to the next statement in the program.
  * 
@@ -175,7 +183,7 @@ finish = (nextWhile,
     notComplete);
 
 /**
- * Run until a debugger statement or breakpoint is hit.
+ * Step until debugger statement or breakpoint is hit.
  */
 run = (nextWhile,
     all(
@@ -192,8 +200,10 @@ run = (nextWhile,
 stepOver = (nextWhile,
     all(
         notComplete,
-        depthGt,
-        not(statementDgr)));
+        or(
+            depthGt,
+            not(statementDgr)),
+        not(debuggerDgr)));
 
 /**
  * Step out of a function call.
@@ -205,5 +215,23 @@ stepOut = (nextWhile,
     and(
         notComplete,
         depthLte));
+
+/* Step Combinators
+ ******************************************************************************/
+/**
+ * Perform one or more stepping operations in sequence left to right, returning
+ * the result from the last.
+ * 
+ * @param steps Array of step operations.
+ */
+sequencea = \steps ->
+    \d ->
+        foldl(
+            \p, c -> c(p),
+            d,
+            steps);
+
+sequence = args \> sequencea;
+
 
 }

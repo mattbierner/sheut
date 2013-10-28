@@ -53,7 +53,7 @@ function(run,
                     operations.execute(d, operations.evaluateInput("typeof b")).value,
                     'undefined');
                 
-                var d1 = step.step(d);
+                var d1 = step.step(step.step(d));
                 assert.equal(
                     operations.execute(d1, operations.evaluateInput("a")).value,
                     3);
@@ -79,7 +79,7 @@ function(run,
             }],
             ["Step goes into and out of functions",
             function(){
-                var d = run.beginFromInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5; debugger;");
+                var d = run.beginFromInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;");
                 d = step.run(d);
                 assert.equal(
                     operations.execute(d, operations.evaluateInput("typeof x")).value,
@@ -91,7 +91,7 @@ function(run,
                     operations.execute(d, operations.stack).length,
                     0);
                     
-                var d1 = step.step(step.step(d));
+                var d1 = step.sequence(step.step, step.step, step.step)(d);
                 assert.equal(
                     operations.execute(d1, operations.evaluateInput("x")).value,
                     3);
@@ -107,8 +107,7 @@ function(run,
             
             ["Step over",
             function(){
-                var d = run.beginFromInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5; debugger;");
-                d = step.step(step.run(d));
+                var d = step.run(run.beginFromInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
                 assert.equal(
                     operations.execute(d, operations.evaluateInput("typeof x")).value,
                     'number');
@@ -119,7 +118,7 @@ function(run,
                     operations.execute(d, operations.stack).length,
                     0);
                     
-                var d1 = step.stepOver(step.step(d));
+                var d1 = step.sequence(step.step, step.stepOver)(d);
                 assert.equal(
                     operations.execute(d1, operations.evaluateInput("x")).value,
                     6);
@@ -131,6 +130,27 @@ function(run,
                 assert.equal(
                     operations.execute(d2, operations.evaluateInput("x")).value,
                     5);
+            }],
+            ["Step over hits debugger in function",
+            function(){
+                var d = step.run(run.beginFromInput("function f(){ var x = 3; debugger; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
+                assert.equal(
+                    operations.execute(d, operations.evaluateInput("typeof x")).value,
+                    'number');
+                assert.equal(
+                    operations.execute(d, operations.evaluateInput("x")).value,
+                    0);
+                assert.equal(
+                    operations.execute(d, operations.stack).length,
+                    0);
+                    
+                var d1 = step.sequence(step.step, step.stepOver)(d);
+                assert.equal(
+                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    3);
+                assert.equal(
+                    operations.execute(d1, operations.stack).length,
+                    1);
             }],
         ],
     };
