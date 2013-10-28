@@ -47,13 +47,12 @@ debug = \p, ctx, ok, err -> let
     perr = \x, ctx ->
         DebugState.create(null, err(x, ctx), ctx, true)
 in
-    Debugger.create(
+    Debugger.initial.setDebug(
         DebugState.create(
             null,
             \() -> interpret.exec(p, ctx, pok, perr),
             ctx,
-            false),
-        []);
+            false));
 
 /**
  * Start debugging a program for a given context.

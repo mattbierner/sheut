@@ -2,7 +2,10 @@
  * @fileOverview
  */
 package (
-    Breakpoint)
+    Breakpoint,
+    
+    createUnconditional,
+    createConditional)
 with
     import 'amulet/record' record,
     import 'atum/debug/debuggable' debuggable,
@@ -18,24 +21,35 @@ Breakpoint = record.declare(null, [
 
 /* Unconditional Breakpoint
  ******************************************************************************/
-var createUnconditionalBreakpoint = \id, loc ->
-    new Breakpoint(
+/**
+ * 
+ */
+createUnconditional = \id, line ->
+    Breakpoint.create(
         id,
-        \d -> operations.execute(d, operations.location,
+        \d -> operations.executeContext(d, operations.location,
             \currentLocation ->
-                (currentLocation && loc.compare(currentLocation) === 0),
+                (currentLocation && currentLocation.start.line === line),
             \_ ->
                 false));
 
 /* Conditional Breakpoint
  ******************************************************************************/
-var createConditionalBreakpoint = \id, expression ->
-    new Breakpoint(
+createConditional = \id, expression ->
+    Breakpoint.create(
         id,
-        \d -> operations.execute(d, toBoolean(expression),
+        \d -> operations.executeContext(d, toBoolean(expression),
             \result ->
                 result && result.value,
             \_ ->
                 false));
+
+/* Binary Breakpoint
+ ******************************************************************************/
+var binaryBreakpoint = \f ->
+    \id, b1, b2 ->
+        Breakpoint.create(
+            id,
+            \d -> f(b1.test(d), b2.test(d)));
 
 }

@@ -41,6 +41,8 @@ Debugger = record.declare(null, [
     'debug',
     'breakpoints']);
 
+Debugger.initial = Debugger.create(null, []);
+
 /* Operations
  ******************************************************************************/
 /**
@@ -48,11 +50,11 @@ Debugger = record.declare(null, [
  */
 isComplete = \d ->
     (d.debug && d.debug.complete);
-    
+
 /**
  * 
  */
-getValue = \d ->
+var getValue = \d ->
     (d.debug && d.debug.complete ?
         d.debug.k :
         null);

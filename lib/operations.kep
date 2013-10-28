@@ -2,6 +2,7 @@
  * @fileOverview
  */
 package (
+    executeContext,
     execute,
     
 // Evaluation
@@ -33,6 +34,22 @@ var thr = \x -> { throw x; };
 /* Execute
  ******************************************************************************/
 /**
+ * Evaluate `p` in provide debug context.
+ * 
+ * @param d Debug context.
+ * @param p Computation.
+ * @param [ok] Success completion.
+ * @param [err] Failure completion.
+ */
+executeContext = \d, p, ok, err ->
+    finish(
+        debug(
+            p,
+            d.ctx,
+            (ok || ret),
+            (err || thr))).debug.k;
+
+/**
  * Evaluate `p` in the current context for `d`.
  * 
  * @param d Debugger state.
@@ -41,12 +58,11 @@ var thr = \x -> { throw x; };
  * @param [err] Failure completion.
  */
 execute = \d, p, ok, err ->
-    finish(
-        debug(
-            p,
-            d.debug.ctx,
-            (ok || ret),
-            (err || thr))).debug.k;
+    executeContext(
+        d.debug,
+        p,
+        ok,
+        err);
 
 /* Evaluation
  ******************************************************************************/
@@ -94,7 +110,7 @@ context = execution_context.context;
 /**
  * Get the current location.
  */
-location = _extractMetadata(\m -> m.location);
+location = _extractMetadata(\m -> m.loc);
 
 /**
  * Get the current stack.

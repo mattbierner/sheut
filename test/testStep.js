@@ -188,6 +188,26 @@ function(run,
                     operations.execute(d4, operations.evaluateInput("x")).value,
                     6);
             }],
+            ["Step out hits debugger",
+            function(){
+                var d = step.run(run.beginFromInput("function f(x){ if (x > 5) { debugger; return x; } return f(x + 1); }; var x = 0; debugger; x = f(0); x = 5;"));
+                    
+                var d1 = step.sequence(step.step, step.step, step.step, step.step, step.step)(d); // 2 calls
+                assert.equal(
+                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    1);
+                assert.equal(
+                    operations.execute(d1, operations.stack).length,
+                    2);
+                
+                var d2 = step.stepOut(d1);
+                assert.equal(
+                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    6);
+               assert.equal(
+                    operations.execute(d2, operations.stack).length,
+                    7);
+            }],
         ],
     };
 });

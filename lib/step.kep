@@ -96,11 +96,14 @@ var any = args \> anya;
 
 /* Breakpoint Policies
  ******************************************************************************/
+/**
+ * 
+ */
 var breakpoint = \current{breakpoints}, next ->
     anya(
         map(
-            \b -> b.test(next),
-            breakpoints));
+            \b -> testNext(b.test.bind(b)),
+            breakpoints))(current, next);
 
 /* Depth Policies
  ******************************************************************************/
@@ -191,7 +194,7 @@ run = (nextWhile,
     all(
         notComplete,
         not(debuggerDgr),
-        breakpoint));
+        not(breakpoint)));
 
 /**
  * Step over a function call.
@@ -212,12 +215,16 @@ stepOver = (nextWhile,
  * 
  * Will also stop for breakpoints and debugger statements even if these occur
  * inside of the stepped over function.
+ * 
+ * Unlike step over, this does not step to the next statement, so expression
+ * with multiple function calls can step into each function.
  */
 stepOut = (nextWhile,
     all(
         notComplete,
         depthGte,
         not(debuggerDgr)));
+
 
 /* Step Combinators
  ******************************************************************************/
@@ -235,6 +242,5 @@ sequencea = \steps ->
             steps);
 
 sequence = args \> sequencea;
-
 
 }
