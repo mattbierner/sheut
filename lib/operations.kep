@@ -28,9 +28,6 @@ with
     import 'sheut/step' {finish}
 in {
 
-var ret = \x -> x;
-var thr = \x -> { throw x; };
-
 /* Execute
  ******************************************************************************/
 /**
@@ -46,8 +43,8 @@ executeContext = \d, p, ok, err ->
         debug(
             p,
             d.ctx,
-            (ok || ret),
-            (err || thr))).debug.k;
+            ok,
+            err)).debug.k;
 
 /**
  * Evaluate `p` in the current context for `d`.

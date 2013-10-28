@@ -9,8 +9,9 @@ package (
 with
     import 'amulet/record' record,
     import 'atum/compute' {bind},
+    import 'atum/compute/program' program,
     import 'atum/debug/debuggable' debuggable,
-    import 'atum/operations/type_conversion' {toBoolean},
+    import 'atum/operations/boolean' {isTrue},
     import 'sheut/operations' operations
 in {
 
@@ -31,26 +32,29 @@ createUnconditional = \id, line ->
         \d -> operations.executeContext(d, operations.location,
             \currentLocation ->
                 (currentLocation && currentLocation.start.line === line),
-            \_ ->
-                false));
+            \_ -> false));
 
 /* Conditional Breakpoint
  ******************************************************************************/
-createConditional = \id, expression ->
+createConditional = \id, prog -> let
+    condition = program.bind(prog, isTrue \> program.liftStatement)
+in
     Breakpoint.create(
         id,
-        \d -> operations.executeContext(d, bind(expression, toBoolean),
-            \result ->
-                result && result.value,
-            \_ ->
-                false));
+        \d -> operations.executeContext(d, condition,
+            \result -> result,
+            \_ -> false));
 
-/* Binary Breakpoint
+/* Breakpoint Combinators
  ******************************************************************************/
-var binaryBreakpoint = \f ->
+var binary = \f ->
     \id, b1, b2 ->
         Breakpoint.create(
             id,
             \d -> f(b1.test(d), b2.test(d)));
+
+var and = binary((&&));
+
+var or = binary((||));
 
 }

@@ -7,7 +7,7 @@ package (
     begin,
     beginFromInput)
 with
-    import 'ecma/parse/parser' parser,
+    import 'ecma/parse/parser' {parse},
     import 'atum/compute' compute,
     import 'atum/compute/context' {ComputeContext},
     import 'atum/interpret' interpret,
@@ -36,16 +36,16 @@ var globalCtx = interpret.complete(
  * 
  * @param p Computation.
  * @param ctx Computation context.
- * @param ok Success callback.
- * @param err Error callback.
+ * @param [ok] Success callback.
+ * @param [err] Error callback.
  * 
  * @return Debugger object.
  */
 debug = \p, ctx, ok, err -> let
     pok = \x, ctx ->
-        DebugState.create(null, ok(x, ctx), ctx, true),
+        DebugState.create(null, (ok || ret)(x, ctx), ctx, true),
     perr = \x, ctx ->
-        DebugState.create(null, err(x, ctx), ctx, true)
+        DebugState.create(null, (err || thr)(x, ctx), ctx, true)
 in
     Debugger.initial.setDebug(
         DebugState.create(
@@ -69,8 +69,8 @@ debugContext = \root, ctx, ok, err ->
         semantics.programBody(
             semantics.sourceElements(root.body)),
         ctx,
-        (ok || ret),
-        (err || thr));
+        ok,
+        err);
 
 /**
  * Start debugging a program in the global context.
@@ -96,7 +96,7 @@ begin = \ast, ok, err ->
  */
 beginFromInput = \text, ok, err ->
     begin(
-        parser.parse(text),
+        parse(text),
         ok,
         err);
 
