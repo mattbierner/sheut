@@ -12,11 +12,29 @@ function(breakpoint,
     return {
         'module': "Breakpoint",
         'tests': [
-            ["Run",
+            ["Basic line bp",
             function(){
                 var d = run.beginFromInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
                 var bp = breakpoint.createUnconditional(0, 3);
+                d = state.addBreakpoint(d, bp);
+                
+                var d1 = step.run(d);
+                assert.equal(
+                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    1);
+
+                var d2 = step.run(d1);
+                assert.equal(
+                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    3);
+            }],
+            
+            ["Basic conditional bp",
+            function(){
+                var d = run.beginFromInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                
+                var bp = breakpoint.createConditional(0, operations.evaluateInput("typeof x !== 'undefined' && x === 1"));
                 d = state.addBreakpoint(d, bp);
                 
                 var d1 = step.run(d);

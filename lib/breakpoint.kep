@@ -8,6 +8,7 @@ package (
     createConditional)
 with
     import 'amulet/record' record,
+    import 'atum/compute' {bind},
     import 'atum/debug/debuggable' debuggable,
     import 'atum/operations/type_conversion' {toBoolean},
     import 'sheut/operations' operations
@@ -38,7 +39,7 @@ createUnconditional = \id, line ->
 createConditional = \id, expression ->
     Breakpoint.create(
         id,
-        \d -> operations.executeContext(d, toBoolean(expression),
+        \d -> operations.executeContext(d, bind(expression, toBoolean),
             \result ->
                 result && result.value,
             \_ ->
