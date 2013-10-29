@@ -5,6 +5,7 @@ package (
     Debugger,
     
     isComplete,
+    getResult,
     addBreakpoint)
 with
     import 'amulet/record' record,
@@ -14,7 +15,10 @@ in {
 /* Debugger
  ******************************************************************************/
 /**
- * State of a debugger object.
+ * State of debugger.
+ * 
+ * @param debug Debugger session state.
+ * @param breakpoints Array of breakpoints.
  */
 Debugger = record.declare(null, [
     'debug',
@@ -33,7 +37,7 @@ isComplete = \d ->
 /**
  * 
  */
-var getValue = \d ->
+getResult = \d ->
     (d.debug && d.debug.complete ?
         d.debug.k :
         null);

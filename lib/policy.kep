@@ -1,0 +1,135 @@
+/**
+ * @fileOverview Operations for stepping through programs.
+ */
+package (
+    always,
+    never,
+    notComplete,
+    
+    not,
+    and,
+    or,
+    all,
+    any,
+    
+    breakpoint,
+    
+    depthGt,
+    depthGte,
+
+    debuggerDgr,
+    statementDgr)
+with
+    import 'atum/compute' compute,
+    import 'atum/compute/tail' {trampoline},
+    import 'atum/debug/debuggable' debuggable,
+    import 'sheut/debug_state' {DebugState},
+    import 'sheut/fun' {foldl, foldr, map, args, identity, constant}
+in {
+
+/* Basic Policies
+ ******************************************************************************/
+always = constant(true);
+
+never = constant(false);
+
+var testNext = \f ->
+    \_, next ->
+        f(next.debug);
+
+notComplete = testNext(\d -> !d.complete);
+
+/* Policy Combinators
+ ******************************************************************************/
+/**
+ * 
+ */
+not = \p -> (p \> (!));
+
+/**
+ * 
+ */
+var binary = \f ->
+    \a, b ->
+        \current, next ->
+            f(a(current, next), b(current, next));
+    
+/**
+ * Are two policies both satisfied?
+ */
+and = binary((&&));
+
+/**
+ * Are either of two policies satisfied.
+ */
+or = binary((||));
+
+/**
+ * Are all of the policies satisfied.
+ * 
+ * @param arr Array of policies
+ */
+var alla = (foldl, and, always);
+
+/**
+ * Are all of the policies, passed as arguments, satisfied.
+ */
+all = args \> alla;
+
+/**
+ * Are any of the policies satisfied.
+ * 
+ * @param arr Array of policies.
+ */
+var anya = (foldl, or, never);
+
+/**
+ * Are any of the policies, passed as arguments, satisfied.
+ */
+any = args \> anya;
+
+/* Breakpoint Policies
+ ******************************************************************************/
+/**
+ * 
+ */
+breakpoint = \current{breakpoints}, next ->
+    anya(
+        map(
+            \b -> b.test.bind(b),
+            breakpoints))(current, next);
+
+/* Depth Policies
+ ******************************************************************************/
+var testDepth = \pred ->
+    \current, next -> 
+        pred(current.debug.depth, next.debug.depth);
+
+/**
+ * Next depth is greater than current depth.
+ */
+depthGt = testDepth((<));
+
+/**
+ * Next depth is greater than or equal to current depth.
+ */
+depthGte = testDepth((<=));
+
+/* Kind Policies
+ ******************************************************************************/
+var testDgr = \pred ->
+    \_, next ->
+        pred(next.debug.dgr);
+
+var dgrInstanceof = \kind ->
+    testDgr(\dgr -> dgr instanceof kind);
+
+debuggerDgr = dgrInstanceof(debuggable.DebuggerDebuggable);
+
+statementDgr = dgrInstanceof(debuggable.StatementDebuggable);
+
+var callDgr = or(
+    dgrInstanceof(debuggable.PreCallDebuggable),
+    dgrInstanceof(debuggable.PostCallDebuggable));
+
+}

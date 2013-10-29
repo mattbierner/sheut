@@ -2,12 +2,14 @@ define(['sheut/breakpoint',
         'sheut/debug',
         'sheut/step',
         'sheut/run',
+        'sheut/policy',
         'sheut/operations/evaluation',
         'sheut/state'],
 function(breakpoint,
         debug,
         step,
         run,
+        policy,
         evaluate,
         state){
    
@@ -86,7 +88,7 @@ function(breakpoint,
                 var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
                 var bp = breakpoint.create(0,
-                    breakpoint.and(
+                    policy.and(
                         breakpoint.conditional(
                             evaluate.evaluateInput("x > 0")),
                         breakpoint.unconditional(3)));

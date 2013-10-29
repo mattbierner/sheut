@@ -5,15 +5,9 @@ package (
     Breakpoint,
     create,
 
-// Base Test
+// Base Policies
     unconditional,
-    conditional,
-
-// Combinators
-    and,
-    or,
-    any,
-    all)
+    conditional)
 with
     import 'amulet/record' record,
     import 'atum/compute' {bind},
@@ -37,7 +31,7 @@ Breakpoint = record.declare(null, [
 
 create = Breakpoint.create;
 
-/* Base Test
+/* Base Policies
  ******************************************************************************/
 /**
  * Test for a breakpoint that unconditionally breaks on a line.
@@ -62,40 +56,5 @@ in
     \_, next -> operations.evaluate(next, condition,
         \result -> result,
         \_ -> false);
-
-/* Combinators
- ******************************************************************************/
-var binary = \f ->
-    \c1, c2 ->
-        \current, next ->
-            f(c1(current, next), c2(current, next));
-
-and = binary((&&));
-
-or = binary((||));
-
-/**
- * Are all of the policies satisfied.
- * 
- * @param arr Array of policies
- */
-var alla = (foldl, and, \ -> true);
-
-/**
- * Are all of the policies, passed as arguments, satisfied.
- */
-all = args \> alla;
-
-/**
- * Are any of the policies satisfied.
- * 
- * @param arr Array of policies.
- */
-var anya = (foldl, or, \ -> false);
-
-/**
- * Are any of the policies, passed as arguments, satisfied.
- */
-any = args \> anya;
 
 }

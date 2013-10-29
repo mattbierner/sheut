@@ -20,6 +20,7 @@ package (
 )
 with
     import 'sheut/debug' {debug, 'execute': executeProgram},
+    import 'sheut/state' {getResult},
     import 'sheut/step' {finish}
 in {
 
@@ -46,7 +47,7 @@ executeContext = \dctx, p, ok, err -> let
             \x, ctx -> \d -> ok(x, ctx, d),
             \x, ctx -> \d -> err(x, ctx, d)))
 in
-    result.debug.k(result);
+    getResult(result)(result);
 
 /**
  * Evaluate `p` in the current context for `d`.

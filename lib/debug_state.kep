@@ -11,6 +11,13 @@ in {
  ******************************************************************************/
 /**
  * State of debug session.
+ * 
+ * @param dgr Debuggable.
+ * @param k Program continuation.
+ * @param ctx Program context.
+ * @param complete Is the computation complete?
+ * 
+ * @property depth The stack size of the continuation.
  */
 DebugState = record.declare(null, [
     'dgr',

@@ -21,119 +21,15 @@ with
     import 'atum/compute/tail' {trampoline},
     import 'atum/debug/debuggable' debuggable,
     import 'sheut/debug_state' {DebugState},
-    import 'sheut/fun' {foldl, foldr, map, args, identity, constant}
+    import 'sheut/fun' {foldl, foldr, map, args, identity, constant},
+    import 'sheut/policy' policy
 in {
-
-/* Basic Policies
- ******************************************************************************/
-var always = constant(true);
-
-var never = constant(false);
-
-var testNext = \f ->
-    \_, next ->
-        f(next.debug);
-
-var notComplete = testNext(\d -> !d.complete);
-
-/* Policy Combinators
- ******************************************************************************/
-/**
- * 
- */
-var not = \p -> (p \> (!));
-
-/**
- * 
- */
-var binary = \f ->
-    \a, b ->
-        \current, next ->
-            f(a(current, next), b(current, next));
-    
-/**
- * Are two policies both satisfied?
- */
-var and = binary((&&));
-
-/**
- * Are either of two policies satisfied.
- */
-var or = binary((||));
-
-/**
- * Are all of the policies satisfied.
- * 
- * @param arr Array of policies
- */
-var alla = (foldl, and, always);
-
-/**
- * Are all of the policies, passed as arguments, satisfied.
- */
-var all = args \> alla;
-
-/**
- * Are any of the policies satisfied.
- * 
- * @param arr Array of policies.
- */
-var anya = (foldl, or, never);
-
-/**
- * Are any of the policies, passed as arguments, satisfied.
- */
-var any = args \> anya;
-
-/* Breakpoint Policies
- ******************************************************************************/
-/**
- * 
- */
-var breakpoint = \current{breakpoints}, next ->
-    anya(
-        map(
-            \b -> b.test.bind(b),
-            breakpoints))(current, next);
-
-/* Depth Policies
- ******************************************************************************/
-var testDepth = \pred ->
-    \current, next -> 
-        pred(current.debug.depth, next.debug.depth);
-
-/**
- * Next depth is greater than current depth.
- */
-var depthGt = testDepth((<));
-
-/**
- * Next depth is greater than or equal to current depth.
- */
-var depthGte = testDepth((<=));
-
-/* Kind Policies
- ******************************************************************************/
-var testDgr = \pred ->
-    \_, next ->
-        pred(next.debug.dgr);
-
-var dgrInstanceof = \kind ->
-    testDgr(\dgr -> dgr instanceof kind);
-
-var debuggerDgr = dgrInstanceof(debuggable.DebuggerDebuggable);
-
-var statementDgr = dgrInstanceof(debuggable.StatementDebuggable);
-
-var callDgr = or(
-    dgrInstanceof(debuggable.PreCallDebuggable),
-    dgrInstanceof(debuggable.PostCallDebuggable));
 
 /*
  ******************************************************************************/
-var abrupt = or(
+/*var abrupt = or(
     not(debuggerDgr),
-    not(breakpoint));
+    not(breakpoint));*/
     
 /* Basic Operations
  ******************************************************************************/
@@ -178,24 +74,24 @@ var stepNone = identity;
  * This will hit whatever the next statement is, including inside functions.
  */
 step = (nextWhile,
-    and(
-        notComplete,
-        not(statementDgr)));
+    policy.and(
+        policy.notComplete,
+        policy.not(policy.statementDgr)));
 
 /**
  * Step to completion.
  */
 finish = (nextWhile,
-    notComplete);
+    policy.notComplete);
 
 /**
  * Step until debugger statement or breakpoint is hit.
  */
 run = (nextWhile,
-    all(
-        notComplete,
-        not(debuggerDgr),
-        not(breakpoint)));
+    policy.all(
+        policy.notComplete,
+        policy.not(policy.debuggerDgr),
+        policy.not(policy.breakpoint)));
 
 /**
  * Step over a function call.
@@ -204,12 +100,12 @@ run = (nextWhile,
  * inside of the stepped over function.
  */
 stepOver = (nextWhile,
-    all(
-        notComplete,
-        or(
-            depthGt,
-            not(statementDgr)),
-        not(debuggerDgr)));
+    policy.all(
+        policy.notComplete,
+        policy.or(
+            policy.depthGt,
+            policy.not(policy.statementDgr)),
+        policy.not(policy.debuggerDgr)));
 
 /**
  * Step out of a function call.
@@ -221,10 +117,10 @@ stepOver = (nextWhile,
  * with multiple function calls can step into each function.
  */
 stepOut = (nextWhile,
-    all(
-        notComplete,
-        depthGte,
-        not(debuggerDgr)));
+    policy.all(
+        policy.notComplete,
+        policy.depthGte,
+        policy.not(policy.debuggerDgr)));
 
 
 /* Step Combinators
