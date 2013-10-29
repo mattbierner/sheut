@@ -20,10 +20,7 @@ package (
     debuggerDgr,
     statementDgr)
 with
-    import 'atum/compute' compute,
-    import 'atum/compute/tail' {trampoline},
     import 'atum/debug/debuggable' debuggable,
-    import 'sheut/debug_state' {DebugState},
     import 'sheut/fun' {foldl, foldr, map, args, identity, constant}
 in {
 

@@ -17,19 +17,18 @@ package (
     sequencea,
     sequence)
 with
-    import 'atum/compute' compute,
     import 'atum/compute/tail' {trampoline},
-    import 'atum/debug/debuggable' debuggable,
+    import 'atum/debug/debuggable' {Debuggable},
     import 'sheut/debug_state' {DebugState},
-    import 'sheut/fun' {foldl, foldr, map, args, identity, constant},
-    import 'sheut/policy' policy
+    import 'sheut/fun' {foldl, args},
+    import 'sheut/policy' policy {notComplete, not, and, all, or, any}
 in {
 
-/*
+/* Policies
  ******************************************************************************/
-/*var abrupt = or(
-    not(debuggerDgr),
-    not(breakpoint));*/
+var abrupt = policy.all(
+    not(policy.debuggerDgr),
+    not(policy.breakpoint));
     
 /* Basic Operations
  ******************************************************************************/
@@ -42,7 +41,7 @@ next = let
     next = \s ->
         (s.complete ? s :
             let c = trampoline(s.k(null, s.ctx)) in
-                (c instanceof debuggable.Debuggable ?
+                (c instanceof Debuggable ?
                     DebugState.create(c, c.k, c.ctx) :
                     c))
 in
@@ -66,32 +65,29 @@ nextWhile = \policy, d -> {
 
 /* Stepping Operations
  ******************************************************************************/
-var stepNone = identity;
-
 /**
  * Perform a single step to the next statement in the program.
  * 
  * This will hit whatever the next statement is, including inside functions.
  */
 step = (nextWhile,
-    policy.and(
-        policy.notComplete,
-        policy.not(policy.statementDgr)));
+    and(
+        notComplete,
+        not(policy.statementDgr)));
 
 /**
  * Step to completion.
  */
 finish = (nextWhile,
-    policy.notComplete);
+    notComplete);
 
 /**
  * Step until debugger statement or breakpoint is hit.
  */
 run = (nextWhile,
-    policy.all(
-        policy.notComplete,
-        policy.not(policy.debuggerDgr),
-        policy.not(policy.breakpoint)));
+    all(
+        notComplete,
+        abrupt));
 
 /**
  * Step over a function call.
@@ -100,12 +96,12 @@ run = (nextWhile,
  * inside of the stepped over function.
  */
 stepOver = (nextWhile,
-    policy.all(
-        policy.notComplete,
-        policy.or(
+    all(
+        notComplete,
+        or(
             policy.depthGt,
-            policy.not(policy.statementDgr)),
-        policy.not(policy.debuggerDgr)));
+            not(policy.statementDgr)),
+        abrupt));
 
 /**
  * Step out of a function call.
@@ -117,11 +113,10 @@ stepOver = (nextWhile,
  * with multiple function calls can step into each function.
  */
 stepOut = (nextWhile,
-    policy.all(
-        policy.notComplete,
+    all(
+        notComplete,
         policy.depthGte,
-        policy.not(policy.debuggerDgr)));
-
+        abrupt));
 
 /* Step Combinators
  ******************************************************************************/
