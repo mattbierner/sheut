@@ -1,10 +1,12 @@
 /**
- * @fileOverview
+ * @fileOverview Operations for stepping through programs.
  */
 package (
-// Operations
+// Base Steps
     next,
+    nextWhile,
     
+// Stepping
     step,
     finish,
     run,
@@ -18,18 +20,9 @@ with
     import 'atum/compute' compute,
     import 'atum/compute/tail' {trampoline},
     import 'atum/debug/debuggable' debuggable,
-    import 'sheut/state' {DebugState, Debugger}
+    import 'sheut/debug_state' {DebugState},
+    import 'sheut/fun' {foldl, foldr, map, args, identity, constant}
 in {
-
-var foldl = \f, z, a -> Array.prototype.reduce.call(a, f, z);
-var foldr = \f, z, a -> Array.prototype.reduceRight.call(a, f, z);
-var map = \f, a -> Array.prototype.map.call(a, f);
-
-var args = \args() -> args;
-
-var identity = \x -> x;
-
-var constant = \x -> \() -> x;
 
 /* Basic Policies
  ******************************************************************************/
@@ -147,8 +140,6 @@ var abrupt = or(
 /**
  * Perform a single step to the next debuggable in the program.
  * 
- * Does not have any stepping policy.
- * 
  * @param d Debugger.
  */
 next = let
@@ -169,7 +160,7 @@ in
  *    when to stop stepping.
  * @param d Debugger.
  */
-var nextWhile = \policy, d -> {
+nextWhile = \policy, d -> {
     var c = d;
     do {
         c = next(c);

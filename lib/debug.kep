@@ -15,7 +15,9 @@ with
     import 'atum/semantics/semantics' semantics,
     import 'atum/builtin/impl/global' global,
     import 'atum/builtin/operations/global' globalOps,
-    import 'sheut/state' {DebugState, Debugger}
+    
+    import 'sheut/debug_state'  {DebugState},
+    import 'sheut/state' {Debugger}
 in {
 
 var ret = \x -> x;
