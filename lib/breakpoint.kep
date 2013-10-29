@@ -1,68 +1,101 @@
 /**
- * @fileOverview
+ * @fileOverview Breakpoint record and operations for creating breakpoints.
  */
 package (
     Breakpoint,
-    
-    createUnconditional,
-    createConditional,
+    create,
+
+// Base Test
+    unconditional,
+    conditional,
 
 // Combinators
     and,
-    or)
+    or,
+    any,
+    all)
 with
     import 'amulet/record' record,
     import 'atum/compute' {bind},
     import 'atum/compute/program' program,
     import 'atum/operations/boolean' {isTrue},
     import 'sheut/run' operations,
-    import 'sheut/operations/context' context
+    import 'sheut/operations/context' context,
+    import 'sheut/fun' {args, foldl}
+
 in {
 
 /* Breakpoint
  ******************************************************************************/
+/**
+ * 
+ */
 Breakpoint = record.declare(null, [
     'id',
     'test',
     'ud']);
 
-/* Unconditional Breakpoint
+create = Breakpoint.create;
+
+/* Base Test
  ******************************************************************************/
 /**
+ * Test for a breakpoint that unconditionally breaks on a line.
  * 
+ * @param line Line Number.
  */
-createUnconditional = \id, line ->
-    Breakpoint.create(
-        id,
-        \current, next -> operations.evaluate(current, context.location,
-            \currentLocation ->
-                operations.evaluate(next, context.location,
-                    \nextLocation -> 
-                        ((!currentLocation || currentLocation.start.line !== line) && nextLocation && nextLocation.start.line === line),
-                    \_ -> false),
-            \_ -> false));
+unconditional = \line ->
+    \current, next -> operations.evaluate(current, context.location,
+        \currentLocation ->
+            operations.evaluate(next, context.location,
+                \nextLocation -> 
+                    ((!currentLocation || currentLocation.start.line !== line) && nextLocation && nextLocation.start.line === line),
+                \_ -> false),
+        \_ -> false);
 
-/* Conditional Breakpoint
- ******************************************************************************/
-createConditional = \id, prog -> let
+/**
+ * Test for a breakpoint that conditionally breaks when a condition is satisfied.
+ */
+conditional = \prog -> let
     condition = program.bind(prog, isTrue \> program.liftStatement)
 in
-    Breakpoint.create(
-        id,
-        \_, next -> operations.evaluate(next, condition,
-            \result -> result,
-            \_ -> false));
+    \_, next -> operations.evaluate(next, condition,
+        \result -> result,
+        \_ -> false);
 
-/* Breakpoint Combinators
+/* Combinators
  ******************************************************************************/
 var binary = \f ->
-    \id, b1, b2 ->
-        Breakpoint.create(
-            id,
-            \d -> f(b1.test(d), b2.test(d)));
+    \c1, c2 ->
+        \current, next ->
+            f(c1(current, next), c2(current, next));
 
 and = binary((&&));
 
 or = binary((||));
+
+/**
+ * Are all of the policies satisfied.
+ * 
+ * @param arr Array of policies
+ */
+var alla = (foldl, and, \ -> true);
+
+/**
+ * Are all of the policies, passed as arguments, satisfied.
+ */
+all = args \> alla;
+
+/**
+ * Are any of the policies satisfied.
+ * 
+ * @param arr Array of policies.
+ */
+var anya = (foldl, or, \ -> false);
+
+/**
+ * Are any of the policies, passed as arguments, satisfied.
+ */
+any = args \> anya;
 
 }

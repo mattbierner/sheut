@@ -1,5 +1,5 @@
 /**
- * @fileOverview
+ * @fileOverview Beginning and running a debug session
  */
 package (
     debug,
@@ -9,7 +9,7 @@ package (
     beginInput)
 with
     import 'ecma/parse/parser' {parse},
-    import 'atum/compute' compute,
+    import 'atum/compute' {sequence, computeContext},
     import 'atum/compute/context' {ComputeContext},
     import 'atum/interpret' interpret,
     import 'atum/semantics/semantics' semantics,
@@ -24,16 +24,14 @@ var ret = \x -> x;
 var thr = \x -> { throw x; };
 
 var globalCtx = interpret.complete(
-    compute.sequence(
+    sequence(
         global.initialize(),
         globalOps.enterGlobal(),
-        compute.computeContext),
+        computeContext),
     ComputeContext.empty,
     ret,
     thr);
 
-/* Operations
- ******************************************************************************/
 /**
  * Debug an existing computation.
  * 
@@ -83,7 +81,9 @@ in
 /**
  * Start debugging a program in the global context.
  * 
- * @see beginContext
+ * @param p Computation to debug.
+ * 
+ * @see debug
  */
 begin = \p, ok, err ->
     debug(
@@ -95,12 +95,14 @@ begin = \p, ok, err ->
 /**
  * Start debugging a program in the global context.
  * 
+ * @param prog Program AST.
+ * 
  * @see begin
  */
-beginProgram = \root, ok, err ->
+beginProgram = \{body}, ok, err ->
     begin(
         semantics.programBody(
-            semantics.sourceElements(root.body)),
+            semantics.sourceElements(body)),
         ok,
         err);
 
