@@ -2,102 +2,160 @@
  * @fileOverview
  */
 package (
-    debug,
-    debugContext,
-    begin,
-    beginFromInput)
+// Execute
+    executeContext,
+    execute,
+    
+// Evaluate
+    evaluateContext,
+    evaluate,
+    
+// Extract
+    extractContext,
+    extract,
+
+// Transform
+    transformContext,
+    transform
+)
 with
-    import 'ecma/parse/parser' {parse},
-    import 'atum/compute' compute,
-    import 'atum/compute/context' {ComputeContext},
-    import 'atum/interpret' interpret,
-    import 'atum/semantics/semantics' semantics,
-    import 'atum/builtin/impl/global' global,
-    import 'atum/builtin/operations/global' globalOps,
-    import 'sheut/state' {DebugState, Debugger}
+    import 'sheut/debug' {debug, 'execute': executeProgram},
+    import 'sheut/step' {finish}
 in {
 
 var ret = \x -> x;
 var thr = \x -> { throw x; };
 
-var globalCtx = interpret.complete(
-    compute.sequence(
-        global.initialize(),
-        globalOps.enterGlobal(),
-        compute.computeContext),
-    ComputeContext.empty,
-    ret,
-    thr);
-
-/* Operations
+/* Execute
  ******************************************************************************/
 /**
- * Debug an existing computation.
+ * Run `p` in provide debug context.
  * 
+ * Calls continuations with the resulting debugger state and result of computation.
+ * 
+ * @param dctx Debug context.
  * @param p Computation.
- * @param ctx Computation context.
- * @param [ok] Success callback.
- * @param [err] Error callback.
- * 
- * @return Debugger object.
+ * @param ok Success continuation.
+ * @param err Failure continuation.
  */
-debug = \p, ctx, ok, err -> let
-    pok = \x, ctx ->
-        DebugState.create(null, (ok || ret)(x, ctx), ctx, true),
-    perr = \x, ctx ->
-        DebugState.create(null, (err || thr)(x, ctx), ctx, true)
+executeContext = \dctx, p, ok, err -> let
+    result = finish(
+        debug(
+            p,
+            dctx.ctx,
+            \x, ctx -> \d -> ok(x, ctx, d),
+            \x, ctx -> \d -> err(x, ctx, d)))
 in
-    Debugger.initial.setDebug(
-        DebugState.create(
-            null,
-            \() -> interpret.exec(p, ctx, pok, perr),
-            ctx,
-            false));
+    result.debug.k(result);
 
 /**
- * Start debugging a program for a given context.
+ * Evaluate `p` in the current context for `d`.
  * 
- * @param root Root the the program's AST.
- * @param state Computation context.
- * @param [ok] Success callback.
- * @param [err] Error callback.
- * 
- * @return Debugger object.
+ * @param d Debugger state.
+ *
+ * @see executeContext
  */
-debugContext = \root, ctx, ok, err ->
-    debug(
-        semantics.programBody(
-            semantics.sourceElements(root.body)),
-        ctx,
+execute = \d, p, ok, err ->
+    executeContext(
+        d.debug,
+        p,
         ok,
         err);
 
+/* Extract
+ ******************************************************************************/
 /**
- * Start debugging a program in the global context.
+ * Evaluate `p` in the given debug context,
  * 
- * @see beginContext
+ * @param dctx Debug context.
+ * @param p Computation,
+ * @param [def] Default value to return when `p` fails.
  */
-begin = \ast, ok, err ->
-    debugContext(
-        ast,
-        globalCtx,
+evaluateContext = \dctx, p, ok, err ->
+    executeContext(
+        dctx,
+        p,
+        (ok || ret),
+        (err || thr));
+
+/**
+ * Evaluate `p` in the context from `d`.
+ * 
+ * @param d Debugger state.
+ * 
+ * @see extractContext
+ */
+evaluate = \d, p, ok, err ->
+    evaluateContext(
+        d.debug,
+        p,
         ok,
         err);
 
+/* Extract
+ ******************************************************************************/
 /**
- * Parse a program and start debugging it in the global context.
+ * Evaluate `p` in the given debug context and return the result.
  * 
- * Throws if the parsing fails. Otherwise, returns all computation results
- * though success and error completions.
+ * On failure, a default value is returned.
  * 
- * @param {String} text Input string.
- * 
- * @see begin.
+ * @param dctx Debug context.
+ * @param p Computation,
+ * @param [def] Default value to return when `p` fails.
  */
-beginFromInput = \text, ok, err ->
-    begin(
-        parse(text),
-        ok,
-        err);
+extractContext = \dctx, p, def ->
+    executeContext(
+        dctx,
+        p,
+        \x, _ -> x,
+        \_, _1 -> def);
+
+/**
+ * Evaluate `p` in the context from `d`.
+ * 
+ * @param d Debugger state.
+ * 
+ * @see extractContext
+ */
+extract = \d, p, def ->
+    extractContext(
+        d.debug,
+        p,
+        def);
+
+/* Transform 
+ ******************************************************************************/
+/**
+ * Evaluate `p` in the given debug context and return the next debug context
+ * resulting from evaluation.
+ * 
+ * @param dctx Debug context.
+ * @param p Computation,
+ * @param [ok] Success completion.
+ * @param [err] Failure completion.
+ */
+transformContext = \dctx, p, ok, err ->
+    finish(
+        debug(
+            p,
+            dctx.ctx,
+            ok,
+            err)).debug;
+
+/**
+ * Evaluate `p` in the context from `d` and return the debugger state resulting
+ * from evaluation.
+ * 
+ * @param d Debugger state.
+ * 
+ * @see transformContext
+ */
+transform = \d, p, ok, err ->
+    d.setDebug(
+        transformContext(
+            d.debug,
+            p,
+            ok,
+            err));
 
 }

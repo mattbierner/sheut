@@ -1,0 +1,45 @@
+/**
+ * @fileOverview
+ */
+package (
+// Program Context
+    environment,
+
+// Metadata
+    context,
+    location,
+    stack)
+with
+    import 'atum/compute' {always},
+    import 'atum/operations/execution_context' execution_context,
+    import 'atum/operations/environment' {'environment': getEnvironment}
+in {
+
+/* Program Context
+ ******************************************************************************/
+/**
+ * Get the execution context.
+ */
+context = execution_context.context;
+        
+environment = getEnvironment;
+
+/* Metadata
+ ******************************************************************************/
+var _extractMetadata = \f ->
+    execution_context.extract(\ctx ->
+        f(ctx.metadata));
+
+
+
+/**
+ * Get the current location.
+ */
+location = _extractMetadata(\m -> m.loc);
+
+/**
+ * Get the current stack.
+ */
+stack = _extractMetadata(\m -> m.stack);
+
+}

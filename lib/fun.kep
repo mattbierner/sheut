@@ -1,0 +1,64 @@
+/**
+ * @fileOverview 
+ */
+package (
+    identity,
+    args,
+    constant,
+    
+    compose,
+    call,
+    apply,
+    flip,
+    
+    curry,
+    
+    concat,
+    map,
+    foldl,
+    foldr,
+    slice)
+{
+
+identity = \x -> x;
+
+args = \args() -> args;
+
+constant = \x -> \() -> x;
+
+compose = \f, g ->
+    \args(...) ->
+        f(g.apply(undefined, args));
+
+call = \args(f, ...) ->
+    Function.prototype.call.apply(f, args);
+
+apply = \f, args ->
+    Function.prototype.apply.apply(f, args);
+
+flip = \f ->
+    \x, y ->
+        f.call(undefined, y, x);
+/* 
+ ******************************************************************************/
+concat = \args(...) ->
+    Array.prototype.concat.apply([], args);
+
+map = \f, a ->
+    Array.prototype.map.call(a, f);
+
+foldl = \f, z, a ->
+    Array.prototype.reduce.call(a, f, z);
+
+foldr = \f, z, a ->
+    Array.prototype.reduceRight.call(a, f, z);
+
+slice = \start, end, a ->
+    Array.prototype.slice.call(a, start, end);
+
+/* 
+ ******************************************************************************/
+curry = \args(f, ...) ->
+    f.bind.apply(f, args);
+
+}

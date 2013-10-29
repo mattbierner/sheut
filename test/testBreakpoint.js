@@ -1,12 +1,14 @@
 define(['sheut/breakpoint',
-        'sheut/run',
+        'sheut/debug',
         'sheut/step',
-        'sheut/operations',
+        'sheut/run',
+        'sheut/operations/evaluation',
         'sheut/state'],
 function(breakpoint,
-        run,
+        debug,
         step,
-        operations,
+        run,
+        evaluate,
         state){
    
     return {
@@ -14,67 +16,67 @@ function(breakpoint,
         'tests': [
             ["Basic line bp",
             function(){
-                var d = run.beginFromInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
                 var bp = breakpoint.createUnconditional(0, 3);
                 d = state.addBreakpoint(d, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
-                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    run.extract(d1, evaluate.evaluateInput("x")).value,
                     1);
 
                 var d2 = step.run(d1);
                 assert.equal(
-                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    run.extract(d2, evaluate.evaluateInput("x")).value,
                     3);
             }],
             ["multi line bp only hit once",
             function(){
-                var d = run.beginFromInput("var x=0 \n x=1; \n x=2; x=3; \n x=4;");
+                var d = debug.beginInput("var x=0 \n x=1; \n x=2; x=3; \n x=4;");
                 
                 var bp = breakpoint.createUnconditional(0, 3);
                 d = state.addBreakpoint(d, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
-                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    run.extract(d1, evaluate.evaluateInput("x")).value,
                     1);
 
                 var d2 = step.run(d1);
                 assert.equal(
-                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    run.extract(d2, evaluate.evaluateInput("x")).value,
                     4);
             }],
             
             ["Basic conditional bp",
             function(){
-                var d = run.beginFromInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
-                var bp = breakpoint.createConditional(0, operations.evaluateInput("typeof x !== 'undefined' && x === 1"));
+                var bp = breakpoint.createConditional(0, evaluate.evaluateInput("typeof x !== 'undefined' && x === 1"));
                 d = state.addBreakpoint(d, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
-                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    run.extract(d1, evaluate.evaluateInput("x")).value,
                     1);
 
                 var d2 = step.run(d1);
                 assert.equal(
-                    operations.execute(d2, operations.evaluateInput("x")).value,
+                    run.extract(d2, evaluate.evaluateInput("x")).value,
                     3);
             }],
             
             ["Bad conditional bp always fails",
             function(){
-                var d = run.beginFromInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
-                var bp = breakpoint.createConditional(0, operations.evaluateInput("d"));
+                var bp = breakpoint.createConditional(0, evaluate.evaluateInput("d"));
                 d = state.addBreakpoint(d, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
-                    operations.execute(d1, operations.evaluateInput("x")).value,
+                    run.extract(d1, evaluate.evaluateInput("x")).value,
                     3);
             }],
         ],

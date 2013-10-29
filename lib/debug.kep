@@ -1,0 +1,121 @@
+/**
+ * @fileOverview
+ */
+package (
+    debug,
+    
+    begin,
+    beginProgram,
+    beginInput)
+with
+    import 'ecma/parse/parser' {parse},
+    import 'atum/compute' compute,
+    import 'atum/compute/context' {ComputeContext},
+    import 'atum/interpret' interpret,
+    import 'atum/semantics/semantics' semantics,
+    import 'atum/builtin/impl/global' global,
+    import 'atum/builtin/operations/global' globalOps,
+    import 'sheut/state' {DebugState, Debugger}
+in {
+
+var ret = \x -> x;
+var thr = \x -> { throw x; };
+
+var globalCtx = interpret.complete(
+    compute.sequence(
+        global.initialize(),
+        globalOps.enterGlobal(),
+        compute.computeContext),
+    ComputeContext.empty,
+    ret,
+    thr);
+
+/* Operations
+ ******************************************************************************/
+/**
+ * Debug an existing computation.
+ * 
+ * Directly returns result of callbacks instead of debugger.
+ * 
+ * @param p Computation.
+ * @param ctx Computation context.
+ * @param ok Success callback.
+ * @param err Error callback.
+ * 
+ * @return Debugger object.
+ */
+var execute = \p, ctx, ok, err ->
+    Debugger.initial.setDebug(
+        DebugState.create(
+            null,
+            \() -> interpret.exec(p, ctx, ok, err),
+            ctx,
+            false));
+
+/* Running
+ ******************************************************************************/
+/**
+ * Debug an existing computation.
+ * 
+ * @param p Computation.
+ * @param ctx Computation context.
+ * @param [ok] Success callback.
+ * @param [err] Error callback.
+ * 
+ * @return Debugger object.
+ */
+debug = \p, ctx, ok, err -> let
+    suc = (ok || ret),
+    fail = (err || thr),
+    pok = \x, ctx ->
+        DebugState.create(null, suc(x, ctx), ctx, true),
+    perr = \x, ctx ->
+        DebugState.create(null, fail(x, ctx), ctx, true)
+in
+    execute(
+        p,
+        ctx,
+        pok,
+        perr);
+
+/**
+ * Start debugging a program in the global context.
+ * 
+ * @see beginContext
+ */
+begin = \p, ok, err ->
+    debug(
+        p,
+        globalCtx,
+        ok,
+        err);
+
+/**
+ * Start debugging a program in the global context.
+ * 
+ * @see begin
+ */
+beginProgram = \root, ok, err ->
+    begin(
+        semantics.programBody(
+            semantics.sourceElements(root.body)),
+        ok,
+        err);
+
+/**
+ * Parse a program and start debugging it in the global context.
+ * 
+ * Throws if the parsing fails. Otherwise, returns all computation results
+ * though success and error completions.
+ * 
+ * @param {String} text Input string.
+ * 
+ * @see begin
+ */
+beginInput = \text, ok, err ->
+    beginProgram(
+        parse(text),
+        ok,
+        err);
+
+}

@@ -18,8 +18,6 @@ with
     import 'atum/compute' compute,
     import 'atum/compute/tail' {trampoline},
     import 'atum/debug/debuggable' debuggable,
-    import 'atum/operations/internal_reference' internal_reference,
-    import 'atum/operations/value_reference' value_reference,
     import 'sheut/state' {DebugState, Debugger}
 in {
 
@@ -111,8 +109,14 @@ var testDepth = \pred ->
     \current, next -> 
         pred(current.debug.depth, next.debug.depth);
 
+/**
+ * Next depth is greater than current depth.
+ */
 var depthGt = testDepth((<));
 
+/**
+ * Next depth is greater than or equal to current depth.
+ */
 var depthGte = testDepth((<=));
 
 /* Kind Policies
@@ -132,6 +136,12 @@ var callDgr = or(
     dgrInstanceof(debuggable.PreCallDebuggable),
     dgrInstanceof(debuggable.PostCallDebuggable));
 
+/*
+ ******************************************************************************/
+var abrupt = or(
+    not(debuggerDgr),
+    not(breakpoint));
+    
 /* Basic Operations
  ******************************************************************************/
 /**

@@ -1,0 +1,29 @@
+/**
+ * @fileOverview
+ */
+package (
+    getFrom,
+    getValue)
+with
+    import 'atum/compute' {always},
+    import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/value_reference' value_reference
+in {
+
+/* References
+ ******************************************************************************/
+/**
+ * Dereference the result of `p` in the compute context from `d`.
+ * 
+ * @see evaluate
+ */
+getFrom = internal_reference.getFrom \> value_reference.getFrom;
+
+/**
+ * Dereference `ref` in the compute context from `d`.
+ * 
+ * @see evaluate
+ */
+getValue = always \> getFrom;
+
+}
