@@ -29,7 +29,7 @@ in {
 var abrupt = policy.all(
     not(policy.debuggerDgr),
     not(policy.breakpoint));
-    
+
 /* Basic Operations
  ******************************************************************************/
 /**
