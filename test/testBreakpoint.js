@@ -50,6 +50,23 @@ function(breakpoint,
                     run.extract(d2, evaluate.evaluateInput("x")).value,
                     4);
             }],
+            ["multi line expression hits on first line once",
+            function(){
+                var d = debug.beginInput("var x = [56]; x = [0, \n, 1, \n 2, 3, \n 4];");
+                
+                var bp = breakpoint.create(0, breakpoint.unconditional(2));
+                d = state.addBreakpoint(d, bp);
+                
+                var d1 = step.run(d);
+                assert.equal(
+                    run.extract(d1, evaluate.evaluateInput("x[0]")).value,
+                    56);
+
+                var d2 = step.run(d1);
+                assert.equal(
+                    run.extract(d2, evaluate.evaluateInput("x[0]")).value,
+                    0);
+            }],
             
             ["Basic conditional bp",
             function(){

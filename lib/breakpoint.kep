@@ -13,11 +13,16 @@ with
     import 'atum/compute' {bind},
     import 'atum/compute/program' program,
     import 'atum/operations/boolean' {isTrue},
+    import 'sheut/fun' {args, foldl},
     import 'sheut/run' {extract},
-    import 'sheut/operations/context' context,
-    import 'sheut/fun' {args, foldl}
-
+    import 'sheut/policy' {and, statementDgr},
+    import 'sheut/operations/context' context
 in {
+
+/* Location Operations
+ ******************************************************************************/
+var containsLine = \location, line ->
+    (location.start.line <= line && line <= location.end.line);
 
 /* Breakpoint
  ******************************************************************************/
@@ -44,11 +49,15 @@ create = Breakpoint.create;
  * @param line Line Number.
  */
 unconditional = \line ->
-    \current, next -> extract(current, context.location, false,
-        \currentLocation ->
-            extract(next, context.location, false,
-                \nextLocation -> 
-                    ((!currentLocation || currentLocation.start.line !== line) && nextLocation && nextLocation.start.line === line)));
+    and(
+        statementDgr,
+        \current, next -> extract(current, context.location, false,
+            \currentLocation ->
+                extract(next, context.location, false,
+                    \nextLocation ->
+                        ((!currentLocation || !containsLine(currentLocation, line)) &&
+                            nextLocation &&
+                            containsLine(nextLocation, line)))));
 
 /**
  * Test for a breakpoint that conditionally breaks when a condition is satisfied.
