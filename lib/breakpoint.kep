@@ -1,5 +1,5 @@
 /**
- * @fileOverview Breakpoint record and operations for creating breakpoints.
+ * @fileOverview Breakpoint record and breakpoint specific policies.
  */
 package (
     Breakpoint,
@@ -13,7 +13,7 @@ with
     import 'atum/compute' {bind},
     import 'atum/compute/program' program,
     import 'atum/operations/boolean' {isTrue},
-    import 'sheut/run' operations,
+    import 'sheut/run' {extract},
     import 'sheut/operations/context' context,
     import 'sheut/fun' {args, foldl}
 
@@ -22,7 +22,12 @@ in {
 /* Breakpoint
  ******************************************************************************/
 /**
+ * Breakpoint record
  * 
+ * @param id Unique identifier this breakpoint.
+ * @param test Policy that determines when this breakpoint is triggered. Policy
+ *     is bound to the breakpoint when called.
+ * @param ud Custom user data stored on the breakpoint.
  */
 Breakpoint = record.declare(null, [
     'id',
@@ -39,13 +44,11 @@ create = Breakpoint.create;
  * @param line Line Number.
  */
 unconditional = \line ->
-    \current, next -> operations.evaluate(current, context.location,
+    \current, next -> extract(current, context.location, false,
         \currentLocation ->
-            operations.evaluate(next, context.location,
+            extract(next, context.location, false,
                 \nextLocation -> 
-                    ((!currentLocation || currentLocation.start.line !== line) && nextLocation && nextLocation.start.line === line),
-                \_ -> false),
-        \_ -> false);
+                    ((!currentLocation || currentLocation.start.line !== line) && nextLocation && nextLocation.start.line === line)));
 
 /**
  * Test for a breakpoint that conditionally breaks when a condition is satisfied.
@@ -53,8 +56,6 @@ unconditional = \line ->
 conditional = \prog -> let
     condition = program.bind(prog, isTrue \> program.liftStatement)
 in
-    \_, next -> operations.evaluate(next, condition,
-        \result -> result,
-        \_ -> false);
+    \_, next -> extract(next, condition, false);
 
 }

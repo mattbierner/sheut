@@ -3,10 +3,10 @@
  */
 package (
 // Program Context
+    context,
     environment,
 
 // Metadata
-    context,
     location,
     stack)
 with
@@ -21,7 +21,7 @@ in {
  * Get the execution context.
  */
 context = execution_context.context;
-        
+
 environment = getEnvironment;
 
 /* Metadata
@@ -29,8 +29,6 @@ environment = getEnvironment;
 var _extractMetadata = \f ->
     execution_context.extract(\ctx ->
         f(ctx.metadata));
-
-
 
 /**
  * Get the current location.

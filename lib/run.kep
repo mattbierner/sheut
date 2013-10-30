@@ -103,12 +103,15 @@ evaluate = \d, p, ok, err ->
  * @param dctx Debug context.
  * @param p Computation,
  * @param [def] Default value to return when `p` fails.
+ * @param [ok] Optional callback to pass the result successful result through before returning it.
  */
-extractContext = \dctx, p, def ->
+extractContext = \dctx, p, def, ok -> let
+    suc = (ok || \x, _ -> x)
+in
     executeContext(
         dctx,
         p,
-        \x, _ -> x,
+        suc,
         \_, _1 -> def);
 
 /**
@@ -118,11 +121,12 @@ extractContext = \dctx, p, def ->
  * 
  * @see extractContext
  */
-extract = \d, p, def ->
+extract = \d, p, def, ok ->
     extractContext(
         d.debug,
         p,
-        def);
+        def,
+        ok);
 
 /* Transform 
  ******************************************************************************/

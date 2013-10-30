@@ -2,16 +2,14 @@
  * @fileOverview
  */
 package (
-// Evaluation
     evaluateAst,
     evaluateInput)
 with
     import 'ecma/parse/parser' {parse},
-    import 'atum/operations/execution_context' execution_context,
     import 'atum/semantics/semantics' {programBody, sourceElements}
 in {
-    
-/* Evaluation
+
+/* Evaluation Operations
  ******************************************************************************/
 /**
  * Evaluate an abstract syntax tree in the compute context from `d`.
