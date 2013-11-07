@@ -12,7 +12,7 @@ package (
 with
     import 'atum/compute' {always},
     import 'atum/operations/execution_context' execution_context,
-    import 'atum/operations/environment' {'environment': getEnvironment}
+    import 'atum/operations/environment' {getEnvironment}
 in {
 
 /* Program Context

@@ -23,6 +23,6 @@ evaluateAst = \root ->
  * 
  * @see evaluate
  */
-evaluateInput = parse \> evaluateAst;
+evaluateInput = parse \>> evaluateAst;
 
 }

@@ -133,6 +133,6 @@ sequencea = \steps ->
             d,
             steps);
 
-sequence = args \> sequencea;
+sequence = args \>> sequencea;
 
 }

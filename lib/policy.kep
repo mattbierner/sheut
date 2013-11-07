@@ -41,7 +41,7 @@ notComplete = testNext(\d -> !d.complete);
 /**
  * 
  */
-not = \p -> (p \> (!));
+not = \p -> (p \>>(!));
 
 /**
  * 
@@ -71,7 +71,7 @@ var alla = (foldl, and, always);
 /**
  * Are all of the policies, passed as arguments, satisfied.
  */
-all = args \> alla;
+all = args \>> alla;
 
 /**
  * Are any of the policies satisfied.
@@ -83,7 +83,7 @@ var anya = (foldl, or, never);
 /**
  * Are any of the policies, passed as arguments, satisfied.
  */
-any = args \> anya;
+any = args \>> anya;
 
 /* Breakpoint Policies
  ******************************************************************************/

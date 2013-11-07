@@ -22,7 +22,7 @@ package (
 
 identity = \x -> x;
 
-args = \args() -> args;
+args = \args(...) -> args;
 
 constant = \x -> \() -> x;
 

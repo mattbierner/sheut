@@ -16,9 +16,9 @@ function(breakpoint,
     return {
         'module': "Context",
         'tests': [
-            ["Environment",
+            ["Get Environment",
             function(){
-                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInput("var a = 0; var b = 0;");
                 
                 var bp = breakpoint.create(0, breakpoint.unconditional(3));
                 d = state.addBreakpoint(d, bp);
