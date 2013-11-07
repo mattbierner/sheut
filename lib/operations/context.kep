@@ -12,7 +12,8 @@ package (
 with
     import 'atum/compute' {always},
     import 'atum/operations/execution_context' execution_context,
-    import 'atum/operations/environment' {getEnvironment}
+    import 'atum/operations/environment' {getEnvironment},
+    import 'sheut/operations/reference' {getFrom}
 in {
 
 /* Program Context
@@ -22,7 +23,7 @@ in {
  */
 context = execution_context.context;
 
-environment = getEnvironment;
+environment = getFrom(getEnvironment);
 
 /* Metadata
  ******************************************************************************/
