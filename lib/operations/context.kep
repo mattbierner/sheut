@@ -10,7 +10,6 @@ package (
     location,
     stack)
 with
-    import 'atum/compute' {always},
     import 'atum/operations/execution_context' execution_context,
     import 'atum/operations/environment' {getEnvironment},
     import 'sheut/operations/reference' {getFrom}

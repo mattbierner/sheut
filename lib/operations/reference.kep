@@ -5,7 +5,7 @@ package (
     getFrom,
     getValue)
 with
-    import 'atum/compute' {always},
+    import 'atum/compute' {just},
     import 'atum/operations/internal_reference' internal_reference,
     import 'atum/operations/value_reference' value_reference
 in {
@@ -24,6 +24,6 @@ getFrom = internal_reference.getFrom \> value_reference.getFrom;
  * 
  * @see evaluate
  */
-getValue = always \> getFrom;
+getValue = just \> getFrom;
 
 }
