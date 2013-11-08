@@ -1,16 +1,20 @@
-define(['sheut/breakpoint',
+define(['atum/compute',
+        'sheut/breakpoint',
         'sheut/debug',
         'sheut/step',
         'sheut/run',
         'sheut/policy',
         'sheut/operations/evaluation',
+        'sheut/operations/context',
         'sheut/state'],
-function(breakpoint,
+function(compute,
+        breakpoint,
         debug,
         step,
         run,
         policy,
         evaluate,
+        context,
         state){
    
     return {
@@ -19,19 +23,18 @@ function(breakpoint,
             ["Get Environment",
             function(){
                 var d = debug.beginInput("var a = 0; var b = 0;");
+               
+                var d1 = step.finish(step.run(d));
                 
-                var bp = breakpoint.create(0, breakpoint.unconditional(3));
-                d = state.addBreakpoint(d, bp);
+                assert.equal(
+                    run.extract(d1, compute.bind(context.environment, context.getEnvironmentOuter)),
+                    null);
                 
-                var d1 = step.run(d);
-                assert.equal(
-                    run.extract(d1, evaluate.evaluateInput("x")).value,
-                    1);
-
-                var d2 = step.run(d1);
-                assert.equal(
-                    run.extract(d2, evaluate.evaluateInput("x")).value,
-                    3);
+               assert.equal(
+                    run.extract(d1, compute.bind(context.environment, function(env) {
+                        return context.getEnvironmentBinding(env, 'a');
+                    })).value,
+                    0);
             }]
         ],
     };

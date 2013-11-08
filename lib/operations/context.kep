@@ -5,14 +5,20 @@ package (
 // Program Context
     context,
     environment,
-
+    getEnvironmentRecord,
+    getEnvironmentOuter,
+    getEnvironmentBinding,
+    
 // Metadata
     location,
     stack)
 with
+    import 'atum/compute' compute {bind, just},
+    import 'atum/context/environment' {ObjectLexicalEnvironment},
     import 'atum/operations/execution_context' execution_context,
-    import 'atum/operations/environment' {getEnvironment},
-    import 'sheut/operations/reference' {getFrom}
+    import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/environment' environment_ops{getEnvironment},
+    import 'sheut/operations/reference' {getFrom, getValue}
 in {
 
 /* Program Context
@@ -22,7 +28,33 @@ in {
  */
 context = execution_context.context;
 
+/**
+ * Get the environment object,
+ */
 environment = getFrom(getEnvironment);
+
+/**
+ * Get a mapping for the bindings for an environment.
+ */
+getEnvironmentRecord = \env ->
+    bind(getValue(env), \env{record} ->
+        (env instanceof ObjectLexicalEnvironment ?
+            compute.bind(getValue(record), \obj -> just(obj.properties)) :
+            just(record)));
+
+/**
+ * Get a mapping for the bindings for an environment.
+ */
+getEnvironmentOuter = \env ->
+    bind(getValue(env), \{outer} -> just(outer));
+
+/**
+ * Get a mapping for the bindings for an environment.
+ * 
+ * @param env
+ * @param name
+ */
+getEnvironmentBinding = internal_reference.getFrom <<\ environment_ops.getEnvironmentBinding;
 
 /* Metadata
  ******************************************************************************/
