@@ -5,7 +5,7 @@ package (
 // Program Context
     context,
     environment,
-    getEnvironmentRecord,
+    getEnvironmentBindings,
     getEnvironmentOuter,
     getEnvironmentBinding,
     
@@ -36,11 +36,11 @@ environment = getFrom(getEnvironment);
 /**
  * Get a mapping for the bindings for an environment.
  */
-getEnvironmentRecord = \env ->
+getEnvironmentBindings= \env ->
     bind(getValue(env), \env{record} ->
         (env instanceof ObjectLexicalEnvironment ?
-            compute.bind(getValue(record), \obj -> just(obj.properties)) :
-            just(record)));
+            compute.bind(getValue(record), \obj -> just(Object.keys(obj.properties))) :
+            just(Object.keys(record))));
 
 /**
  * Get a mapping for the bindings for an environment.
