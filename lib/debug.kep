@@ -8,10 +8,10 @@ package (
     beginProgram,
     beginInput)
 with
-    import 'ecma/parse/parser' {parse},
     import 'atum/compute' {sequence, computeContext},
     import 'atum/compute/context' {ComputeContext},
     import 'atum/interpret' interpret,
+    import 'atum/operations/evaluation' {evaluateModuleText},
     import 'atum/semantics/semantics' semantics,
     import 'atum/builtin/impl/global' global,
     import 'atum/builtin/operations/global' globalOps,
@@ -107,18 +107,15 @@ beginProgram = \{body}, ok, err ->
         err);
 
 /**
- * Parse a program and start debugging it in the global context.
- * 
- * Throws if the parsing fails. Otherwise, returns all computation results
- * though success and error completions.
+ * Parse a program and start debugging it in the global context
  * 
  * @param {String} text Input string.
  * 
  * @see begin
  */
 beginInput = \text, ok, err ->
-    beginProgram(
-        parse(text),
+    begin(
+        evaluateModuleText(text),
         ok,
         err);
 

@@ -6,6 +6,7 @@ package (
     evaluateInput)
 with
     import 'ecma/parse/parser' {parse},
+    import 'atum/operations/evaluation' {evaluateText},
     import 'atum/semantics/semantics' {programBody, sourceElements}
 in {
 
@@ -23,6 +24,6 @@ evaluateAst = \root ->
  * 
  * @see evaluate
  */
-evaluateInput = parse \>> evaluateAst;
+evaluateInput = evaluateText;
 
 }
