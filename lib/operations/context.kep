@@ -4,6 +4,8 @@
 package (
 // Program Context
     context,
+    
+// Environment
     environment,
     getEnvironmentBindings,
     getEnvironmentOuter,
@@ -11,14 +13,21 @@ package (
     
 // Metadata
     location,
-    stack)
+    
+// Stack
+    stack,
+    getStackFrameName)
 with
     import 'atum/compute' compute {bind, just},
     import 'atum/context/environment' {ObjectLexicalEnvironment},
+    import 'atum/semantics/expression' {logicalOr},
+    import 'atum/operations/environment' environment_ops{getEnvironment},
     import 'atum/operations/execution_context' execution_context,
     import 'atum/operations/internal_reference' internal_reference,
-    import 'atum/operations/environment' environment_ops{getEnvironment},
-    import 'sheut/operations/reference' {getFrom, getValue}
+    import 'atum/operations/object' object,
+    import 'atum/operations/string' string,
+    import 'sheut/operations/reference' {getFrom, getValue},
+    import 'atum/operations/type_conversion' {toString}
 in {
 
 /* Program Context
@@ -28,6 +37,8 @@ in {
  */
 context = execution_context.context;
 
+/* Environment
+ ******************************************************************************/
 /**
  * Get the environment object,
  */
@@ -67,9 +78,26 @@ var _extractMetadata = \f ->
  */
 location = _extractMetadata(\m -> m.loc);
 
+/* Stack
+ ******************************************************************************/
 /**
  * Get the current stack.
  */
 stack = _extractMetadata(\m -> m.stack);
+
+/**
+ * Get a display name for a stack frame.
+ */
+getStackFrameName = let
+    anon = string.create('[Anonymous Function]')
+in
+    \frame{func} ->
+        compute.branch(object.hasProperty(func, 'name'),
+            logicalOr(
+                compute.bind(
+                    object.get(func, 'name'),
+                    toString),
+                anon),
+            anon);
 
 }
