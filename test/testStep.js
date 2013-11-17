@@ -181,7 +181,7 @@ function(debug,
             function(){
                 var d = step.run(debug.beginInput("function f(x){ return (x > 5 ? x : f(x + 1)); }; var x = 0; debugger; x = f(0); x = 5;"));
                     
-                var d1 = step.sequence(step.step, step.step, step.step, step.step)(d); // 3 calls
+                var d1 = step.sequence(step.step, step.step, step.step, step.step, step.step, step.step)(d); // 3 calls
                 assert.equal(
                     run.extract(d1, evaluate.evaluateInput("x")).value,
                     2);
@@ -214,7 +214,7 @@ function(debug,
             function(){
                 var d = step.run(debug.beginInput("function f(x){ if (x > 5) { debugger; return x; } return f(x + 1); }; var x = 0; debugger; x = f(0); x = 5;"));
                     
-                var d1 = step.sequence(step.step, step.step, step.step, step.step, step.step)(d); // 2 calls
+                var d1 = step.sequence(step.step, step.step, step.step, step.step, step.step, step.step)(d); // 2 calls
                 assert.equal(
                     run.extract(d1, evaluate.evaluateInput("x")).value,
                     1);
