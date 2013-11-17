@@ -95,7 +95,7 @@ function(debug,
                     run.extract(d, context.stack).length,
                     0);
                     
-                var d1 = step.sequence(step.step, step.step, step.step)(d);
+                var d1 = step.sequence(step.step, step.step, step.step, step.step)(d);
                 assert.equal(
                     run.extract(d1, evaluate.evaluateInput("x")).value,
                     3);
@@ -107,6 +107,24 @@ function(debug,
                 assert.equal(
                     run.extract(d2, evaluate.evaluateInput("x")).value,
                     6);
+            }],
+            ["Step goes into empty",
+            function(){
+                var d = debug.beginInput("var x= 4;\nfunction f(x){ };\ndebugger; f(3);");
+                d = step.run(d);
+                    
+                var d1 = step.step(step.step(d));
+                assert.equal(
+                    run.extract(d1, evaluate.evaluateInput("x")).value,
+                    3);
+                assert.equal(
+                    run.extract(d1, context.stack).length,
+                    1);
+                
+                var d2 = step.step(d1);
+                assert.equal(
+                    run.extract(d2, evaluate.evaluateInput("x")).value,
+                    4);
             }],
         
         // Step over
