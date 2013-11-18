@@ -2,8 +2,10 @@
  * @fileOverview
  */
 package (
+    getOwnPropertyNames,
     getOwnProperties,
-    getPrototype)
+    getPrototype,
+    get)
 with
     import 'atum/compute' {bind, just, enumerationa},
     import 'atum/operations/error' error,
@@ -16,13 +18,20 @@ with
 in {
 
 /**
+ * Get a hosted array of property names for an object
+ * 
+ * @param obj Object reference.
+ */
+getOwnPropertyNames = object.getOwnPropertyNames;
+
+/**
  * Get a hosted mapping of names to values for an object.
  * 
  * @param obj Object reference.
  */
 getOwnProperties = \obj ->
     bind(
-        object.getOwnPropertyNames(obj),
+        getOwnPropertyNames(obj),
         \names ->
             bind(
                 map((object.get, obj), names) |> enumerationa,
@@ -43,5 +52,13 @@ getPrototype = \obj ->
         (isObject(t) ?
             just(t.proto) :
             error.typeError()));
+
+/**
+ * Get the value of a property on an object.
+ * 
+ * @param obj Object reference.
+ * @param name Property name.
+ */
+get = object.get;
 
 }
