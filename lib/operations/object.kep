@@ -22,7 +22,7 @@ in {
  * 
  * @param obj Object reference.
  */
-getOwnPropertyNames = object.getOwnPropertyNames;
+getOwnPropertyNames = \obj -> object.getOwnPropertyNames(obj);
 
 /**
  * Get a hosted mapping of names to values for an object.
@@ -34,7 +34,7 @@ getOwnProperties = \obj ->
         getOwnPropertyNames(obj),
         \names ->
             bind(
-                map((object.get, obj), names) |> enumerationa,
+                map((get, obj), names) |> enumerationa,
                 \values ->
                     just(foldl(
                         \p, name, i -> {
