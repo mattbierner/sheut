@@ -1,0 +1,47 @@
+/**
+ * @fileOverview
+ */
+package (
+    getOwnProperties,
+    getPrototype)
+with
+    import 'atum/compute' {bind, just, enumerationa},
+    import 'atum/operations/error' error,
+    import 'atum/operations/object' object,
+    import 'atum/operations/value_reference' value_reference,
+    import 'atum/value/value' {isObject},
+
+    import 'sheut/fun' {foldl, map},
+    import 'sheut/operations/reference' {getFrom, getValue}
+in {
+
+/**
+ * Get a hosted mapping of names to values for an object.
+ * 
+ * @param obj Object reference.
+ */
+getOwnProperties = \obj ->
+    bind(
+        object.getOwnPropertyNames(obj),
+        \names ->
+            bind(
+                map((object.get, obj), names) |> enumerationa,
+                \values ->
+                    just(foldl(
+                        \p, name, i -> {
+                            p[name] = values[i];
+                            return p;
+                        },
+                        {},
+                        names))));
+
+/**
+ * Get the prototype of an object.
+ */
+getPrototype = \obj ->
+    value_reference.dereference(obj, \t ->
+        (isObject(t) ?
+            just(t.proto) :
+            error.typeError()));
+
+}
