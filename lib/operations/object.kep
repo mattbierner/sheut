@@ -5,13 +5,16 @@ package (
     getOwnPropertyNames,
     getOwnProperties,
     getPrototype,
-    get)
+    get,
+    
+    displayName)
 with
     import 'atum/compute' {bind, just, enumerationa},
     import 'atum/operations/error' error,
     import 'atum/operations/object' object,
     import 'atum/operations/value_reference' value_reference,
     import 'atum/value/value' {isObject},
+    import 'atum/value/type' type,
 
     import 'sheut/fun' {foldl, map},
     import 'sheut/operations/reference' {getFrom, getValue}
@@ -60,5 +63,26 @@ getPrototype = \obj ->
  * @param name Property name.
  */
 get = object.get;
+
+/**
+ * 
+ */
+displayName = \val ->
+    value_reference.dereference(val, \t -> {
+        switch (t.type) {
+        case type.STRING:
+        case type.NUMBER:
+        case type.BOOLEAN:
+            return just(t.value + '');
+
+        case type.NULL:
+        case type.UNDEFINED:
+            return just(t.value + '');
+            
+        default:
+            return just(t + '');
+        }
+    });
+
 
 }
