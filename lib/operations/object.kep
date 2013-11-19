@@ -22,7 +22,7 @@ in {
  * 
  * @param obj Object reference.
  */
-getOwnPropertyNames = \obj -> object.getOwnPropertyNames(obj);
+getOwnPropertyNames = object.getOwnPropertyNames;
 
 /**
  * Get a hosted mapping of names to values for an object.
