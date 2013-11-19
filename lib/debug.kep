@@ -20,17 +20,19 @@ with
     import 'sheut/state' {Debugger}
 in {
 
+var memo = \f -> {
+    var val;
+    return \args(...) -> {
+        if (val !== undefined)
+            return val;
+        val = f.apply(null, args);
+        return val;
+    };
+};
+
 var ret = \x -> x;
 var thr = \x -> { throw x; };
 
-var globalCtx = interpret.complete(
-    sequence(
-        global.initialize(),
-        globalOps.enterGlobal(),
-        computeContext),
-    ComputeContext.empty,
-    ret,
-    thr);
 
 /**
  * Debug an existing computation.
@@ -51,6 +53,18 @@ var execute = \p, ctx, ok, err ->
             \() -> interpret.exec(p, ctx, ok, err),
             ctx,
             false));
+
+/* Initialization
+ ******************************************************************************/
+var getGlobalContext = memo <|\->
+    interpret.complete(
+        sequence(
+            global.initialize(),
+            globalOps.enterGlobal(),
+            computeContext),
+        ComputeContext.empty,
+        ret,
+        thr);
 
 /* Running
  ******************************************************************************/
@@ -88,7 +102,7 @@ in
 begin = \p, ok, err ->
     debug(
         p,
-        globalCtx,
+        getGlobalContext(),
         ok,
         err);
 
