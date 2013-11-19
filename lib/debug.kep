@@ -115,7 +115,7 @@ beginProgram = \{body}, ok, err ->
  */
 beginInput = \text, ok, err ->
     begin(
-        semantics.programBody(evaluateModuleText(text)),
+        evaluateModuleText(text),
         ok,
         err);
 
