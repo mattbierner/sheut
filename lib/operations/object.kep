@@ -84,10 +84,12 @@ displayName = \val ->
             return just('undefined');
         
         case type.OBJECT:
-            return functionCall(
-                ObjectPrototypeToString,
-                just(ref),
-                enumeration());
+            return bind(
+                functionCall(
+                    ObjectPrototypeToString,
+                    just(ref),
+                    enumeration(),
+                displayName));
         
         default:
             return just(t + '');
