@@ -2,6 +2,8 @@
  * @fileOverview Beginning and running a debug session
  */
 package (
+    initialize,
+    
     debug,
     
     begin,
@@ -56,15 +58,22 @@ var execute = \p, ctx, ok, err ->
 
 /* Initialization
  ******************************************************************************/
-var getGlobalContext = memo <|\->
+initialize = memo <| \custom ->
     interpret.complete(
         sequence(
             global.initialize(),
             globalOps.enterGlobal(),
+            custom || compute.emtpy,
             computeContext),
         ComputeContext.empty,
-        ret,
+        \x -> { globalContext = x; return x; },
         thr);
+
+var getGlobalContext = \-> {
+    if (!globalContext)
+        return initialize();
+    return globalContext;
+};
 
 /* Running
  ******************************************************************************/

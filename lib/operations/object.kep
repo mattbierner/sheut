@@ -9,8 +9,10 @@ package (
     
     displayName)
 with
-    import 'atum/compute' {bind, just, enumerationa},
-    import 'atum/operations/error' error,
+    import 'atum/compute' {bind, just, enumeration, enumerationa},
+    import 'atum/builtin/object' {ObjectPrototypeToString},
+    import 'atum/operations/error' {typeError},
+    import 'atum/operations/func' {functionCall},
     import 'atum/operations/object' object,
     import 'atum/operations/value_reference' value_reference,
     import 'atum/value/value' {isObject},
@@ -54,7 +56,7 @@ getPrototype = \obj ->
     value_reference.dereference(obj, \t ->
         (isObject(t) ?
             just(t.proto) :
-            error.typeError()));
+            typeError()));
 
 /**
  * Get the value of a property on an object.
@@ -68,7 +70,7 @@ get = object.get;
  * 
  */
 displayName = \val ->
-    value_reference.dereference(val, \t -> {
+    value_reference.dereference(val, \t, ref -> {
         switch (t.type) {
         case type.STRING:
         case type.NUMBER:
@@ -76,9 +78,17 @@ displayName = \val ->
             return just(t.value + '');
 
         case type.NULL:
+            return just('null');
+
         case type.UNDEFINED:
-            return just(t.value + '');
-            
+            return just('undefined');
+        
+        case type.OBJECT:
+            return functionCall(
+                ObjectPrototypeToString,
+                just(ref),
+                enumeration());
+        
         default:
             return just(t + '');
         }
