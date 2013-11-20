@@ -88,8 +88,8 @@ displayName = \val ->
                 functionCall(
                     ObjectPrototypeToString,
                     just(ref),
-                    enumeration(),
-                displayName));
+                    enumeration()),
+                displayName);
         
         default:
             return just(t + '');
