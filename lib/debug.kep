@@ -10,7 +10,7 @@ package (
     beginProgram,
     beginInput)
 with
-    import 'atum/compute' {sequence, computeContext},
+    import 'atum/compute' compute{sequence, computeContext},
     import 'atum/compute/context' {ComputeContext},
     import 'atum/interpret' interpret,
     import 'atum/operations/evaluation' {evaluateModuleText},
@@ -58,12 +58,14 @@ var execute = \p, ctx, ok, err ->
 
 /* Initialization
  ******************************************************************************/
+var globalContext;
+
 initialize = memo <| \custom ->
     interpret.complete(
         sequence(
             global.initialize(),
             globalOps.enterGlobal(),
-            custom || compute.emtpy,
+            custom || compute.empty,
             computeContext),
         ComputeContext.empty,
         \x -> { globalContext = x; return x; },

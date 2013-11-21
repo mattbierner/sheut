@@ -16,13 +16,26 @@ package (
     
     depthGt,
     depthGte,
-
+    depthEq,
+    
     debuggerDgr,
-    statementDgr)
+    statementDgr,
+    
+    line,
+    sameLine)
 with
     import 'atum/debug/debuggable' debuggable,
-    import 'sheut/fun' {foldl, foldr, map, args, identity, constant}
+
+    import 'sheut/fun' {foldl, foldr, map, args, identity, constant},
+    import 'sheut/run' {extract},
+    import 'sheut/operations/context' context
 in {
+
+/* Location Operations
+ ******************************************************************************/
+var containsLine = \location, line ->
+    (location.start.line <= line && line <= location.end.line);
+
 
 /* Basic Policies
  ******************************************************************************/
@@ -112,6 +125,11 @@ depthGt = testDepth((<));
  */
 depthGte = testDepth((<=));
 
+/**
+ * Next depth is the same as current depth.
+ */
+depthEq = testDepth((===));
+
 /* Kind Policies
  ******************************************************************************/
 var testDgr = \pred ->
@@ -128,5 +146,31 @@ statementDgr = dgrInstanceof(debuggable.StatementDebuggable);
 var callDgr = or(
     dgrInstanceof(debuggable.PreCallDebuggable),
     dgrInstanceof(debuggable.PostCallDebuggable));
+
+/* Location
+ ******************************************************************************/
+/**
+ * Next location contains `line`
+ */
+line = \line ->
+    \_, next ->
+        extract(next, context.location, false,
+            \nextLocation ->
+                containsLine(nextLocation, line));
+
+        /*
+var location = \loc ->
+    \_, next ->
+        extract(next, context.location, false,
+            \nextLocation ->
+                containsLocation(loc, nextLocation));
+*/
+        
+sameLine = \current, next ->
+    extract(current, context.location, false,
+        \currentLocation ->
+            extract(next, context.location, false,
+                \nextLocation ->
+                    (currentLocation && nextLocation && containsLine(currentLocation, nextLocation.start.line))));
 
 }

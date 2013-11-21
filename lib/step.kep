@@ -8,6 +8,8 @@ package (
     
 // Stepping
     step,
+    stepNextLine,
+    stepTo,
     finish,
     run,
     stepOver,
@@ -19,9 +21,10 @@ package (
 with
     import 'atum/compute/tail' {trampoline},
     import 'atum/debug/debuggable' {Debuggable},
+    
     import 'sheut/debug_state' {DebugState},
     import 'sheut/fun' {foldl, args},
-    import 'sheut/policy' policy {notComplete, not, and, all, or, any}
+    import 'sheut/policy' policy {notComplete, not, and, all, or, any, sameLine}
 in {
 
 /* Policies
@@ -73,7 +76,22 @@ nextWhile = \policy, d -> {
 step = (nextWhile,
     and(
         notComplete,
-        not(policy.statementDgr)));
+        not <| policy.statementDgr));
+
+/**
+ * Perform a single step to the next line in the program in a block of statements.
+ * 
+ * Will hit debug points and function calls, even on the same line.
+ * 
+ */
+stepNextLine = (nextWhile,
+    all(
+        notComplete,
+        sameLine,
+        any(
+            not <| policy.statementDgr,
+            policy.depthEq),
+        abrupt));
 
 /**
  * Step to completion.
@@ -100,7 +118,7 @@ stepOver = (nextWhile,
         notComplete,
         or(
             policy.depthGt,
-            not(policy.statementDgr)),
+            not <| policy.statementDgr),
         abrupt));
 
 /**

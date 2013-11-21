@@ -20,12 +20,19 @@ package (
 )
 with
     import 'sheut/debug' {debug, 'execute': executeProgram},
-    import 'sheut/state' {getResult},
-    import 'sheut/step' {finish}
+    import 'sheut/state' {getResult}
 in {
 
 var ret = \x -> x;
 var thr = \x -> { throw x; };
+
+var finish = \args(...) -> {
+    with
+        import 'sheut/step' {finish}
+    in {
+        return finish.apply(null, args);
+    }
+};
 
 /* Execute
  ******************************************************************************/
