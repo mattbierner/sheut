@@ -12,6 +12,8 @@ package (
 with
     import 'atum/compute' compute{sequence, computeContext},
     import 'atum/compute/context' {ComputeContext},
+    import 'atum/compute/statement' statement,
+    import 'atum/compute/program' program,
     import 'atum/interpret' interpret,
     import 'atum/operations/evaluation' {evaluateModuleText},
     import 'atum/semantics/semantics' semantics,
@@ -140,7 +142,7 @@ beginProgram = \{body}, ok, err ->
  */
 beginInput = \text, ok, err ->
     begin(
-        evaluateModuleText(text),
+        program.liftStatement(statement.liftExpression(evaluateModuleText(text))),
         ok,
         err);
 

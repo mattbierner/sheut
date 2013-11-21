@@ -64,7 +64,7 @@ unconditional = \line ->
  * Test for a breakpoint that conditionally breaks when a condition is satisfied.
  */
 conditional = \prog -> let
-    condition = program.bind(prog, isTrue \>> program.liftStatement)
+    condition = bind(prog, isTrue)
 in
     \_, next -> extract(next, condition, false);
 

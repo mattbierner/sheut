@@ -19,6 +19,9 @@ package (
     transform
 )
 with
+    import 'atum/compute/statement' statement,
+    import 'atum/compute/program' program,
+    
     import 'sheut/debug' {debug, 'execute': executeProgram},
     import 'sheut/state' {getResult}
 in {
@@ -49,7 +52,7 @@ var finish = \args(...) -> {
 executeContext = \dctx, p, ok, err -> let
     result = finish(
         debug(
-            p,
+            program.liftStatement(statement.liftExpression(p)),
             dctx.ctx,
             \x, ctx -> \d -> ok(x, ctx, d),
             \x, ctx -> \d -> err(x, ctx, d)))
