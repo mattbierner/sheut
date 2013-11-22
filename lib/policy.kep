@@ -24,7 +24,7 @@ package (
     line,
     sameLine)
 with
-    import 'atum/debug/debuggable' debuggable,
+    import 'sheut/semantics/debug/debuggable' debuggable,
 
     import 'sheut/fun' {foldl, foldr, map, args, identity, constant},
     import 'sheut/run' {extract},

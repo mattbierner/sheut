@@ -18,7 +18,7 @@ function(compute,
         'tests': [
             ["Get Empty Stack",
             function(){
-                var d = debug.beginInput("function f(){}; debugger; ");
+                var d = debug.beginInput("function f(){}; ");
                
                 var d1 = step.run(d);
                 

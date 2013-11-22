@@ -15,12 +15,15 @@ with
     import 'atum/compute/statement' statement,
     import 'atum/compute/program' program,
     import 'atum/interpret' interpret,
-    import 'atum/operations/evaluation' {evaluateModuleText},
-    import 'atum/semantics/semantics' semantics,
+    import 'atum/operations/evaluation' {evaluateText},
     import 'atum/builtin/impl/global' global,
     import 'atum/builtin/operations/global' globalOps,
     
-    import 'sheut/debug_state'  {DebugState},
+    import 'ecma/parse/parser' {parse},
+    
+    import 'sheut/semantics/semantics' semantics,
+
+    import 'sheut/debug_state' {DebugState},
     import 'sheut/state' {Debugger}
 in {
 
@@ -62,11 +65,16 @@ var execute = \p, ctx, ok, err ->
  ******************************************************************************/
 var globalContext;
 
+var sm = {
+    'sourceElements': semantics.sourceElements
+};
+
 initialize = memo <| \custom ->
-    interpret.complete(
+    interpret.exec(
         sequence(
             global.initialize(),
             globalOps.enterGlobal(),
+            compute.modifyContext(\ctx -> ctx.setSemantics(sm)),
             custom || compute.empty,
             computeContext),
         ComputeContext.empty,
@@ -142,7 +150,7 @@ beginProgram = \{body}, ok, err ->
  */
 beginInput = \text, ok, err ->
     begin(
-        program.liftStatement(statement.liftExpression(evaluateModuleText(text))),
+        evaluateText(text),
         ok,
         err);
 

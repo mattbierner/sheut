@@ -95,7 +95,7 @@ function(debug,
                     run.extract(d, context.stack).length,
                     0);
                     
-                var d1 = step.sequence(step.step, step.step, step.step, step.step)(d);
+                var d1 = step.sequence(step.step, step.step, step.step)(d);
                 assert.equal(
                     run.extract(d1, evaluate.evaluateInput("x")).value,
                     3);

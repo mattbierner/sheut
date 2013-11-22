@@ -20,7 +20,7 @@ package (
     sequence)
 with
     import 'atum/compute/tail' {trampoline},
-    import 'atum/debug/debuggable' {Debuggable},
+    import 'sheut/semantics/debug/debuggable' {Debuggable},
     
     import 'sheut/debug_state' {DebugState},
     import 'sheut/fun' {foldl, args},

@@ -50,7 +50,7 @@ function(compute,
             }],
             ["Outer ",
             function(){
-                var d = debug.beginInput("var a = 0; function f() { var a = 10; debugger; } f(); ");
+                var d = debug.beginInput("var a = 0; function f() { var a = 10; debugger; } f(); a = 3 ");
                
                 var d1 = step.run(d);
                 

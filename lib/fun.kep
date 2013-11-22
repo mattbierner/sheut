@@ -26,9 +26,12 @@ args = \args(...) -> args;
 
 constant = \x -> \() -> x;
 
-compose = \f, g ->
-    \args(...) ->
+compose = \f, g -> {
+    if (!f || !g)
+        debugger;
+    return \args(...) ->
         f(g.apply(undefined, args));
+};
 
 call = \args(f, ...) ->
     Function.prototype.call.apply(f, args);
