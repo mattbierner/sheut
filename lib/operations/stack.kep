@@ -1,0 +1,86 @@
+/**
+ * @fileOverview
+ */
+package (
+    stack,
+    getStackFrameName)
+with
+    import 'amulet/record' record,
+
+    import 'atum/compute' compute {bind, binds, enumeration, just},
+    import 'atum/context/environment' {ObjectLexicalEnvironment},
+    import 'atum/semantics/expression' {logicalOr},
+    import 'atum/operations/environment' environment_ops{getEnvironment},
+    import 'atum/operations/execution_context' execution_context,
+    import 'atum/operations/internal_reference' internal_reference,
+    import 'atum/operations/object' object,
+    import 'atum/operations/string' string,
+    import 'sheut/operations/reference' {getFrom, getValue},
+    import 'atum/operations/type_conversion' {toString},
+    
+    import 'sheut/operations/context' context
+in {
+
+/**
+ * @member func Reference to function.
+ * 
+ * @member environment The current environment of the frame. For a function in the
+ *  stack, this is the environment that existed before the next frame's function call
+ *  was made.
+ *  
+ * @member location The current location of the frame. For a function in the
+ *  stack, this is the location where the next frame's function call was made.
+ */
+var Frame = record.declare(null, [
+    'func',
+    'environment',
+    'location']);
+
+/* Stack
+ ******************************************************************************/
+
+
+/**
+ * Get the current stack.
+ * 
+ * Stack is an array with the top element first. Always contains a single global
+ * frame.
+ */
+stack = let
+    _stack = execution_context.extract(\ctx ->
+        ctx.metadata.stack)
+in
+    binds(
+        enumeration(
+            _stack,
+            context.location,
+            context.environment),
+        \stack, loc, env -> {
+            var out = [];
+            var func = null;
+            stack.forEach <|\frame{env, loc} -> {
+                out.unshift(Frame.create(func, env, loc));
+                func = frame.func;
+            };
+            out.unshift(Frame.create(func, env, loc));
+            return just(out);
+        });
+
+/**
+ * Get a display name for a stack frame.
+ */
+getStackFrameName = let
+    anon = string.create('[Anonymous Function]'),
+    global = string.create('[global]')
+in
+    \frame{func} ->
+        (!func ? global : 
+            compute.branch(object.hasProperty(func, 'name'),
+                logicalOr(
+                    compute.bind(
+                        object.get(func, 'name'),
+                        toString),
+                    anon),
+                anon));
+
+}
