@@ -64,12 +64,8 @@ function(compute,
                 
                 var s = run.extract(d1, stack.stack);
                 
-                var name = run.extract(d1, context.getStackFrameName(s[0]))
                 assert.equal(
-                    name.type,
-                    'string');
-                assert.equal(
-                    name.value,
+                    run.extract(d1, stack.getStackFrameName(s[0])),
                     'f');
             }],
             ["Get Unnamed Frame name",
@@ -80,13 +76,31 @@ function(compute,
                 
                 var s = run.extract(d1, stack.stack);
                 
-                var name = run.extract(d1, context.getStackFrameName(s[0]));
                 assert.equal(
-                    name.type,
-                    'string');
-                assert.equal(
-                    name.value,
+                    run.extract(d1, stack.getStackFrameName(s[0])),
                     '[Anonymous Function]');
+            }],
+             ["Ordering",
+            function(){
+                var d = debug.beginInput("function f(){ return g(); }; function g() { debugger; }; f();");
+               
+                var d1 = step.run(d);
+                
+                var s = run.extract(d1, stack.stack);
+                
+                assert.equal(s.length, 3);
+                
+                assert.equal(
+                    run.extract(d1, stack.getStackFrameName(s[0])),
+                    'g');
+                
+                assert.equal(
+                     run.extract(d1, stack.getStackFrameName(s[1])),
+                    'f');
+                
+                assert.equal(
+                    run.extract(d1, stack.getStackFrameName(s[2])),
+                    '[global]');
             }],
             
             ["Get Stack env",

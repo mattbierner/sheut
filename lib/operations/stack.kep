@@ -16,7 +16,6 @@ with
     import 'atum/operations/object' object,
     import 'atum/operations/string' string,
     import 'sheut/operations/reference' {getFrom, getValue},
-    import 'atum/operations/type_conversion' {toString},
     
     import 'sheut/operations/context' context
 in {
@@ -58,7 +57,7 @@ in
         \stack, loc, env -> {
             var out = [];
             var func = null;
-            stack.forEach <|\frame{environment, location} -> {
+            stack.reverse().forEach <|\frame{environment, location} -> {
                 out.unshift(Frame.create(func, environment, location));
                 func = frame.func;
             };
@@ -70,17 +69,14 @@ in
  * Get a display name for a stack frame.
  */
 getStackFrameName = let
-    anon = string.create('[Anonymous Function]'),
-    global = string.create('[global]')
+    anon = just('[Anonymous Function]'),
+    global = just('[global]')
 in
     \frame{func} ->
         (!func ? global : 
             compute.branch(object.hasProperty(func, 'name'),
-                logicalOr(
-                    compute.bind(
-                        object.get(func, 'name'),
-                        toString),
-                    anon),
+                bind(bind(object.get(func, 'name'), string.toHost), \name ->
+                    (name ? just(name) : anon)),
                 anon));
 
 }
