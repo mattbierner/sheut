@@ -58,8 +58,8 @@ in
         \stack, loc, env -> {
             var out = [];
             var func = null;
-            stack.forEach <|\frame{env, loc} -> {
-                out.unshift(Frame.create(func, env, loc));
+            stack.forEach <|\frame{environment, location} -> {
+                out.unshift(Frame.create(func, environment, location));
                 func = frame.func;
             };
             out.unshift(Frame.create(func, env, loc));
