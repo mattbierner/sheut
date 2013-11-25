@@ -85,10 +85,10 @@ displayName = \val ->
         
         case type.OBJECT:
             return bind(
-                functionCall(
+                functionApply(
                     ObjectPrototypeToString,
-                    just(ref),
-                    enumeration()),
+                    ref,
+                    []),
                 displayName);
         
         default:
