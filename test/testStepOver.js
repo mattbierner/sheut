@@ -14,7 +14,7 @@ function(debug,
         'tests': [
             ["Step over",
             function(){
-                var d = step.run(debug.beginInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
+                var d = step.run(debug.beginInitialInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof x")).value,
                     'number');
@@ -40,7 +40,7 @@ function(debug,
             }],
             ["Step over hits debugger in function",
             function(){
-                var d = step.run(debug.beginInput("function f(){ var x = 3; debugger; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
+                var d = step.run(debug.beginInitialInput("function f(){ var x = 3; debugger; return x * 2; }; var x = 0; debugger; x = f(); x = 5;"));
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof x")).value,
                     'number');

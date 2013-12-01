@@ -5,9 +5,15 @@ package (
     initialize,
     
     debug,
+    debugInitial,
     
+    beginInitial,
     begin,
+    
+    beginInitialProgram,
     beginProgram,
+    
+    beginInitialInput,
     beginInput)
 with
     import 'atum/compute' compute{sequence, computeContext},
@@ -53,11 +59,11 @@ var thr = \x -> { throw x; };
  * 
  * @return Debugger object.
  */
-var execute = \p, ctx, ok, err ->
-    Debugger.initial.setDebug(
+var execute = \d, p, ctx, ok, err ->
+    d.setDebug(
         DebugState.create(
             null,
-            \() -> interpret.exec(p, ctx, ok, err),
+            \-> interpret.exec(p, ctx, ok, err),
             ctx,
             false));
 
@@ -69,6 +75,9 @@ var sm = {
     'sourceElements': semantics.sourceElements
 };
 
+/**
+ * 
+ */
 initialize = memo <| \custom ->
     interpret.exec(
         sequence(
@@ -92,6 +101,7 @@ var getGlobalContext = \-> {
 /**
  * Debug an existing computation.
  * 
+ * @param d Debugger state.
  * @param p Computation.
  * @param ctx Computation context.
  * @param [ok] Success callback.
@@ -99,7 +109,7 @@ var getGlobalContext = \-> {
  * 
  * @return Debugger object.
  */
-debug = \p, ctx, ok, err -> let
+debug = \d, p, ctx, ok, err -> let
     suc = (ok || ret),
     fail = (err || thr),
     pok = \x, ctx ->
@@ -108,20 +118,51 @@ debug = \p, ctx, ok, err -> let
         DebugState.create(null, fail(x, ctx), ctx, true)
 in
     execute(
+        d,
         p,
         ctx,
         pok,
         perr);
 
 /**
+ * Debug an existing computation in a new debugger state.
+ * 
+ * @see debug
+ */
+debugInitial = \p, ctx, ok, err ->
+    debug(
+        Debugger.initial,
+        p,
+        ctx,
+        ok,
+        err);
+
+/**
  * Start debugging a program in the global context.
+ * 
+ * @param d Debugger context.
+ * @param p Computation to debug.
+ * 
+ * @see debug
+ */
+begin = \d, p, ok, err ->
+    debug(
+        d,
+        p,
+        getGlobalContext(),
+        ok,
+        err);
+
+/**
+ * Start debugging a program in a new debugger context.
  * 
  * @param p Computation to debug.
  * 
  * @see debug
  */
-begin = \p, ok, err ->
+beginInitial = \p, ok, err ->
     debug(
+        Debugger.initial,
         p,
         getGlobalContext(),
         ok,
@@ -134,23 +175,54 @@ begin = \p, ok, err ->
  * 
  * @see begin
  */
-beginProgram = \{body}, ok, err ->
+beginProgram = \d, {body}, ok, err ->
     begin(
+        d,
         semantics.programBody(
             semantics.sourceElements(body)),
         ok,
         err);
 
 /**
- * Parse a program and start debugging it in the global context
+ * Start debugging a program in the global context.
  * 
- * @param {String} text Input string.
+ * @param prog Program AST.
  * 
  * @see begin
  */
-beginInput = \text, ok, err ->
+beginInitialProgram = \prog, ok, err ->
+    beginProgram(
+        Debugger.initial,
+        prog,
+        ok,
+        err);
+
+/**
+ * Parse a program and start debugging it in the global computation context
+ * 
+ * @param d Debug context.
+ * @param {String} text Input string.
+ * @param [ok] Success completion.
+ * @param [err] Error completion.
+ * 
+ * @see begin
+ */
+beginInput = \d, text, ok, err ->
     begin(
+        d,
         evaluateText(text),
+        ok,
+        err);
+
+/**
+ * Parse a program and start debugging it in a new debug context.
+ * 
+ * @see beginInput
+ */
+beginInitialInput = \text, ok, err ->
+    beginInput(
+        Debugger.initial,
+        text,
         ok,
         err);
 

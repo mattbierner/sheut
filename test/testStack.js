@@ -20,7 +20,7 @@ function(compute,
         'tests': [
             ["Get Empty Stack",
             function(){
-                var d = debug.beginInput("function f(){}; ");
+                var d = debug.beginInitialInput("function f(){}; ");
                
                 var d1 = step.run(d);
                 
@@ -30,7 +30,7 @@ function(compute,
             }],
             ["Get Empty Stack env",
             function(){
-                var d = debug.beginInput("var x = 2; function f(x){ }; f(4); debugger;");
+                var d = debug.beginInitialInput("var x = 2; function f(x){ }; f(4); debugger;");
                
                 var d1 = step.run(d);
                 
@@ -47,7 +47,7 @@ function(compute,
             
             ["Get Simple Stack",
             function(){
-                var d = debug.beginInput("function f(x){ if (x > 0) f(x -1); debugger; return x; }; f(10)");
+                var d = debug.beginInitialInput("function f(x){ if (x > 0) f(x -1); debugger; return x; }; f(10)");
                
                 var d1 = step.run(d);
                 
@@ -58,7 +58,7 @@ function(compute,
             }],
             ["Get Simple Frame name",
             function(){
-                var d = debug.beginInput("function f(x){ debugger; return x; }; f(10)");
+                var d = debug.beginInitialInput("function f(x){ debugger; return x; }; f(10)");
                
                 var d1 = step.run(d);
                 
@@ -70,7 +70,7 @@ function(compute,
             }],
             ["Get Unnamed Frame name",
             function(){
-                var d = debug.beginInput("(function(){ debugger; }())");
+                var d = debug.beginInitialInput("(function(){ debugger; }())");
                
                 var d1 = step.run(d);
                 
@@ -82,7 +82,7 @@ function(compute,
             }],
              ["Ordering",
             function(){
-                var d = debug.beginInput("function f(){ return g(); }; function g() { debugger; }; f();");
+                var d = debug.beginInitialInput("function f(){ return g(); }; function g() { debugger; }; f();");
                
                 var d1 = step.run(d);
                 
@@ -105,7 +105,7 @@ function(compute,
             
             ["Get Stack env",
             function(){
-                var d = debug.beginInput("var x = 2; function f(x){ function g(x) { debugger; }; return g(x * 2) }; f(4);");
+                var d = debug.beginInitialInput("var x = 2; function f(x){ function g(x) { debugger; }; return g(x * 2) }; f(4);");
                
                 var d1 = step.run(d);
                 

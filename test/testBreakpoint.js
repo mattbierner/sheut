@@ -18,10 +18,12 @@ function(breakpoint,
         'tests': [
             ["Basic line bp",
             function(){
-                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = state.Debugger.initial;
                 
-                var bp = breakpoint.create(0, breakpoint.unconditional(3));
-                d = state.addBreakpoint(d, bp);
+                var bp = breakpoint.create(breakpoint.unconditional(3));
+                d = state.addBreakpoint(d, 0, bp);
+                
+                d = debug.beginInput(d, "var x=0 \n x=1; \n x=2; \n x=3;");
                 
                 var d1 = step.run(d);
                 assert.equal(
@@ -35,10 +37,10 @@ function(breakpoint,
             }],
             ["multi line bp only hit once",
             function(){
-                var d = debug.beginInput("var x=0 \n x=1; \n x=2; x=3; \n x=4;");
+                var d = debug.beginInitialInput("var x=0 \n x=1; \n x=2; x=3; \n x=4;");
                 
-                var bp = breakpoint.create(0, breakpoint.unconditional(3));
-                d = state.addBreakpoint(d, bp);
+                var bp = breakpoint.create(breakpoint.unconditional(3));
+                d = state.addBreakpoint(d, 0, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
@@ -52,10 +54,10 @@ function(breakpoint,
             }],
             ["multi line expression hits on first line once",
             function(){
-                var d = debug.beginInput("var x = [56]; x = [0, \n 1, \n 2, 3, \n 4];");
+                var d = debug.beginInitialInput("var x = [56]; x = [0, \n 1, \n 2, 3, \n 4];");
                 
-                var bp = breakpoint.create(0, breakpoint.unconditional(2));
-                d = state.addBreakpoint(d, bp);
+                var bp = breakpoint.create(breakpoint.unconditional(2));
+                d = state.addBreakpoint(d, 0, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
@@ -73,11 +75,11 @@ function(breakpoint,
             
             ["Basic conditional bp",
             function(){
-                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInitialInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
-                var bp = breakpoint.create(0, breakpoint.conditional(
+                var bp = breakpoint.create(breakpoint.conditional(
                     evaluate.evaluateInput("typeof x !== 'undefined' && x === 1")));
-                d = state.addBreakpoint(d, bp);
+                d = state.addBreakpoint(d, 0, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
@@ -92,10 +94,10 @@ function(breakpoint,
             
             ["Bad conditional bp always fails",
             function(){
-                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInitialInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
-                var bp = breakpoint.create(0, breakpoint.conditional(evaluate.evaluateInput("d")));
-                d = state.addBreakpoint(d, bp);
+                var bp = breakpoint.create(breakpoint.conditional(evaluate.evaluateInput("d")));
+                d = state.addBreakpoint(d, 0, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(
@@ -105,15 +107,15 @@ function(breakpoint,
             
             ["And conditional bp",
             function(){
-                var d = debug.beginInput("var x=0 \n x=1; \n x=2; \n x=3;");
+                var d = debug.beginInitialInput("var x=0 \n x=1; \n x=2; \n x=3;");
                 
-                var bp = breakpoint.create(0,
+                var bp = breakpoint.create(
                     policy.and(
                         breakpoint.conditional(
                             evaluate.evaluateInput("x > 0")),
                         breakpoint.unconditional(3)));
                 
-                d = state.addBreakpoint(d, bp);
+                d = state.addBreakpoint(d, 0, bp);
                 
                 var d1 = step.run(d);
                 assert.equal(

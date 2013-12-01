@@ -2,22 +2,10 @@
  * @fileOverview
  */
 package (
-// Execute
-    executeContext,
     execute,
-    
-// Evaluate
-    evaluateContext,
     evaluate,
-    
-// Extract
-    extractContext,
     extract,
-
-// Transform
-    transformContext,
-    transform
-)
+    transform)
 with
     import 'atum/compute/statement' statement,
     import 'atum/compute/program' program,
@@ -37,140 +25,79 @@ var finish = \args(...) -> {
     }
 };
 
-/* Execute
- ******************************************************************************/
+
 /**
  * Run `p` in provide debug context.
  * 
  * Calls continuations with the resulting debugger state and result of computation.
  * 
- * @param dctx Debug context.
+ * @param d Debugger state.
  * @param p Computation.
  * @param ok Success continuation.
  * @param err Failure continuation.
  */
-executeContext = \dctx, p, ok, err -> let
+execute = \d, p, ok, err -> let
     result = finish(
         debug(
+            d,
             program.liftStatement(statement.liftExpression(p)),
-            dctx.ctx,
+            d.debug.ctx,
             \x, ctx -> \d -> ok(x, ctx, d),
             \x, ctx -> \d -> err(x, ctx, d)))
 in
     getResult(result)(result);
 
 /**
- * Evaluate `p` in the current context for `d`.
- * 
- * @param d Debugger state.
- *
- * @see executeContext
- */
-execute = \d, p, ok, err ->
-    executeContext(
-        d.debug,
-        p,
-        ok,
-        err);
-
-/* Extract
- ******************************************************************************/
-/**
  * Evaluate `p` in the given debug context,
  * 
- * @param dctx Debug context.
+ * @param d Debugger state.
  * @param p Computation,
  * @param [def] Default value to return when `p` fails.
  */
-evaluateContext = \dctx, p, ok, err ->
-    executeContext(
-        dctx,
+evaluate = \d, p, ok, err ->
+    execute(
+        d,
         p,
         (ok || ret),
         (err || thr));
 
-/**
- * Evaluate `p` in the context from `d`.
- * 
- * @param d Debugger state.
- * 
- * @see extractContext
- */
-evaluate = \d, p, ok, err ->
-    evaluateContext(
-        d.debug,
-        p,
-        ok,
-        err);
 
-/* Extract
- ******************************************************************************/
 /**
  * Evaluate `p` in the given debug context and return the result.
  * 
  * On failure, a default value is returned.
  * 
- * @param dctx Debug context.
+ * @param d Debugger state.
  * @param p Computation,
  * @param [def] Default value to return when `p` fails.
  * @param [ok] Optional callback to pass the result successful result through before returning it.
  */
-extractContext = \dctx, p, def, ok -> let
+extract = \d, p, def, ok -> let
     suc = (ok || ret)
 in
-    executeContext(
-        dctx,
+    execute(
+        d,
         p,
         suc,
         \_, _ -> def);
 
-/**
- * Evaluate `p` in the context from `d`.
- * 
- * @param d Debugger state.
- * 
- * @see extractContext
- */
-extract = \d, p, def, ok ->
-    extractContext(
-        d.debug,
-        p,
-        def,
-        ok);
 
-/* Transform 
- ******************************************************************************/
 /**
  * Evaluate `p` in the given debug context and return the next debug context
  * resulting from evaluation.
  * 
- * @param dctx Debug context.
+ * @param d Debugger state.
  * @param p Computation,
  * @param [ok] Success completion.
  * @param [err] Failure completion.
  */
-transformContext = \dctx, p, ok, err ->
+transform = \d, p, ok, err ->
     finish(
         debug(
+            d,
             p,
-            dctx.ctx,
+            d.debug.ctx,
             ok,
             err)).debug;
-
-/**
- * Evaluate `p` in the context from `d` and return the debugger state resulting
- * from evaluation.
- * 
- * @param d Debugger state.
- * 
- * @see transformContext
- */
-transform = \d, p, ok, err ->
-    d.setDebug(
-        transformContext(
-            d.debug,
-            p,
-            ok,
-            err));
 
 }

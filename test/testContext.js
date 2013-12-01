@@ -22,7 +22,7 @@ function(compute,
         'tests': [
             ["Get Environment",
             function(){
-                var d = debug.beginInput("var a = 0; var b = 0;");
+                var d = debug.beginInitialInput("var a = 0; var b = 0;");
                
                 var d1 = step.run(d);
                 
@@ -50,7 +50,7 @@ function(compute,
             }],
             ["Outer ",
             function(){
-                var d = debug.beginInput("var a = 0; function f() { var a = 10; debugger; } f(); a = 3 ");
+                var d = debug.beginInitialInput("var a = 0; function f() { var a = 10; debugger; } f(); a = 3 ");
                
                 var d1 = step.run(d);
                 

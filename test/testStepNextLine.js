@@ -15,7 +15,7 @@ function(debug,
             ["Multi Line Stement",
             function(){
                 var d = step.stepNextLine(step.step(
-                    debug.beginInput("var x= 0;\n x = 3; x =4; x =5;\n x= 6")));
+                    debug.beginInitialInput("var x= 0;\n x = 3; x =4; x =5;\n x= 6")));
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("x")).value,
                     0);
@@ -32,7 +32,7 @@ function(debug,
             }],
             ["Step next line goes into and out of functions",
             function(){
-                var d = debug.beginInput("function f(x){ x *= 2; return x * 3; };\n var x = 0; debugger;\n x = f(4);\n x = 5;");
+                var d = debug.beginInitialInput("function f(x){ x *= 2; return x * 3; };\n var x = 0; debugger;\n x = f(4);\n x = 5;");
                 d = step.run(d);
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof x")).value,

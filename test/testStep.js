@@ -14,7 +14,7 @@ function(debug,
         'tests': [
             ["Run",
             function(){
-                var d = debug.beginInput("var a, b; a = 3; debugger; b = 4; debugger; a = 5;");
+                var d = debug.beginInitialInput("var a, b; a = 3; debugger; b = 4; debugger; a = 5;");
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof a")).value,
                     'undefined');
@@ -49,7 +49,7 @@ function(debug,
             
             ["Step",
             function(){
-                var d = step.step(debug.beginInput("var a, b; a = 3; b = 4; a = 5;"));
+                var d = step.step(debug.beginInitialInput("var a, b; a = 3; b = 4; a = 5;"));
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof a")).value,
                     'undefined');
@@ -83,7 +83,7 @@ function(debug,
             }],
             ["Step goes into and out of functions",
             function(){
-                var d = debug.beginInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;");
+                var d = debug.beginInitialInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;");
                 d = step.run(d);
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof x")).value,
@@ -110,7 +110,7 @@ function(debug,
             }],
             ["Step goes into empty",
             function(){
-                var d = debug.beginInput("var x= 4;\nfunction f(x){ };\ndebugger; f(3);");
+                var d = debug.beginInitialInput("var x= 4;\nfunction f(x){ };\ndebugger; f(3);");
                 d = step.run(d);
                     
                 var d1 = step.step(step.step(d));

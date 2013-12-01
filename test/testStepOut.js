@@ -14,7 +14,7 @@ function(debug,
         'tests': [
             ["Step out",
             function(){
-                var d = step.run(debug.beginInput("function f(x){ return (x > 5 ? x : f(x + 1)); }; var x = 0; debugger; x = f(0); x = 5;"));
+                var d = step.run(debug.beginInitialInput("function f(x){ return (x > 5 ? x : f(x + 1)); }; var x = 0; debugger; x = f(0); x = 5;"));
                     
                 var d1 = step.sequence(step.step, step.step, step.step, step.step)(d); // 3 calls
                 assert.equal(
@@ -47,7 +47,7 @@ function(debug,
             }],
             ["Step out hits debugger",
             function(){
-                var d = step.run(debug.beginInput("function f(x){ if (x > 5) { debugger; return x; } return f(x + 1); }; var x = 0; debugger; x = f(0); x = 5;"));
+                var d = step.run(debug.beginInitialInput("function f(x){ if (x > 5) { debugger; return x; } return f(x + 1); }; var x = 0; debugger; x = f(0); x = 5;"));
                     
                 var d1 = step.sequence(step.step, step.step, step.step, step.step, step.step)(d); // 2 calls
                 assert.equal(

@@ -9,10 +9,10 @@ package (
     
     displayName)
 with
-    import 'atum/compute' {bind, just, enumeration, enumerationa},
+    import 'atum/compute' {bind, just, enumerationa},
     import 'atum/builtin/object' {ObjectPrototypeToString},
     import 'atum/operations/error' {typeError},
-    import 'atum/operations/func' {functionCall},
+    import 'atum/operations/func' {functionApply},
     import 'atum/operations/object' object,
     import 'atum/operations/value_reference' value_reference,
     import 'atum/value/value' {isObject},

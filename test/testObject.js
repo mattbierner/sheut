@@ -22,7 +22,7 @@ function(compute,
         'tests': [
             ["Simple Get Properties",
             function(){
-                var d = debug.beginInput("var x = {'x': 3, 'y': 4}");
+                var d = debug.beginInitialInput("var x = {'x': 3, 'y': 4}");
                
                 var d1 = step.finish(d);
                 

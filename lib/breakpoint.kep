@@ -29,13 +29,11 @@ var containsLine = \location, line ->
 /**
  * Breakpoint record
  * 
- * @param id Unique identifier this breakpoint.
  * @param test Policy that determines when this breakpoint is triggered. Policy
  *     is bound to the breakpoint when called.
  * @param ud Custom user data stored on the breakpoint.
  */
 Breakpoint = record.declare(null, [
-    'id',
     'test',
     'ud']);
 

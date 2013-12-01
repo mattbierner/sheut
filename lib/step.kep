@@ -116,7 +116,7 @@ run = (nextWhile,
 stepOver = (nextWhile,
     all(
         notComplete,
-        or(
+        any(
             policy.depthGt,
             not <| policy.statementDgr),
         abrupt));

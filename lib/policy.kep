@@ -106,8 +106,8 @@ any = args \>> anya;
 breakpoint = \current{breakpoints}, next ->
     anya(
         map(
-            \b -> b.test.bind(b),
-            breakpoints))(current, next);
+            \b -> breakpoints[b].test.bind(b),
+            Object.keys(breakpoints)))(current, next);
 
 /* Depth Policies
  ******************************************************************************/

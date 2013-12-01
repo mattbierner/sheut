@@ -6,9 +6,13 @@ package (
     
     isComplete,
     getResult,
-    addBreakpoint)
+    
+    addBreakpoint,
+    removeBreakpoint)
 with
     import 'amulet/record' record,
+    import 'amulet/object' {deleteProperty, setProperty},
+
     import 'sheut/fun' {concat}
 in {
 
@@ -24,7 +28,7 @@ Debugger = record.declare(null, [
     'debug',
     'breakpoints']);
 
-Debugger.initial = Debugger.create(null, []);
+Debugger.initial = Debugger.create(null, {});
 
 /* Operations
  ******************************************************************************/
@@ -43,12 +47,26 @@ getResult = \d ->
         null);
 
 /**
+ * Register a breakpoint.
  * 
+ * Overwrites any breakpoint alreay registered with the given id.
+ * 
+ * @param d Debug state.
+ * @param id Unique id for breakpoint.
+ * @param breakpoint Breakpoint object.
  */
-addBreakpoint = \d, breakpoint ->
+addBreakpoint = \d, id, breakpoint ->
     d.setBreakpoints(
-        concat(
-            d.breakpoints,
-            breakpoint));
+        setProperty(d.breakpoints, id, breakpoint, true));
+
+/**
+ * Unregister a breakpoint.
+ * 
+ * @param d Debug state.
+ * @param id Unique id for breakpoint.
+ */
+removeBreakpoint = \d, id ->
+    d.setBreakpoints(
+        deleteProperty(d.breakpoints, id));
 
 }
