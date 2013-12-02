@@ -10,7 +10,7 @@ in {
 /* DebugState
  ******************************************************************************/
 /**
- * State of debug session.
+ * State of debugged program.
  * 
  * @param dgr Debuggable.
  * @param k Program continuation.

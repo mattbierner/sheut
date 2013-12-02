@@ -2,16 +2,11 @@
  * @fileOverview
  */
 package (
-    execute,
     evaluate,
     extract,
     transform)
 with
-    import 'atum/compute/statement' statement,
-    import 'atum/compute/program' program,
-    import 'atum/interpret' interpret,
-    
-    import 'sheut/debug' {debugInitial, debug, 'execute': executeProgram},
+    import 'sheut/debug' {debugInitial},
     import 'sheut/state' {getResult}
 in {
 
@@ -26,8 +21,6 @@ var finish = \args(...) -> {
     }
 };
 
-/* Running
- ******************************************************************************/
 /**
  * Run `p` in provide debug context.
  * 
@@ -38,17 +31,20 @@ var finish = \args(...) -> {
  * @param ok Success continuation.
  * @param err Failure continuation.
  */
-execute = \d, p, ok, err ->
+var execute = \d, p, ok, err ->
     (debugInitial(p, d.debug.ctx, ok, err)
         |> finish
         |> getResult);
 
+/* Running
+ ******************************************************************************/
 /**
- * Evaluate `p` in the given debug context,
+ * Evaluate `p` in the given debug context.
  * 
  * @param d Debugger state.
  * @param p Computation,
- * @param [def] Default value to return when `p` fails.
+ * @param [ok] Success callback.
+ * @param [err] Failure callback.
  */
 evaluate = \d, p, ok, err ->
     execute(

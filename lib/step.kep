@@ -36,20 +36,21 @@ var abrupt = policy.all(
 /* Basic Operations
  ******************************************************************************/
 /**
+ */
+var nextContext = \s ->
+    (s.complete ? s :
+        let c = trampoline(s.k(null, s.ctx)) in
+            (c instanceof Debuggable ?
+                DebugState.create(c, c.k, c.ctx, false) :
+                c));
+
+/**
  * Perform a single step to the next debuggable in the program.
  * 
  * @param d Debugger.
  */
-next = let
-    next = \s ->
-        (s.complete ? s :
-            let c = trampoline(s.k(null, s.ctx)) in
-                (c instanceof Debuggable ?
-                    DebugState.create(c, c.k, c.ctx, false) :
-                    c))
-in
-    \d ->
-        d.setDebug(next(d.debug));
+next = \d ->
+    d.setDebug(nextContext(d.debug));
 
 /**
  * Step while `policy` is satisfied.
