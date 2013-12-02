@@ -45,7 +45,7 @@ next = let
         (s.complete ? s :
             let c = trampoline(s.k(null, s.ctx)) in
                 (c instanceof Debuggable ?
-                    DebugState.create(c, c.k, c.ctx) :
+                    DebugState.create(c, c.k, c.ctx, false) :
                     c))
 in
     \d ->
@@ -60,9 +60,11 @@ in
  */
 nextWhile = \policy, d -> {
     var c = d;
+    var previous;
     do {
+        previous = c;
         c = next(c);
-    } while (policy(d, c));
+    } while (policy(d, c, previous));
     return c;
 };
 

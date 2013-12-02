@@ -58,7 +58,8 @@ function(compute,
             }],
             ["Get Simple Frame name",
             function(){
-                var d = debug.beginInitialInput("function f(x){ debugger; return x; }; f(10)");
+                var d = debug.beginInitialInput(
+                    "function f(x){ debugger; return x; }; f(10)");
                
                 var d1 = step.run(d);
                 

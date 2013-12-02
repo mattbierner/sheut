@@ -61,8 +61,8 @@ not = \p -> (p \>>(!));
  */
 var binary = \f ->
     \a, b ->
-        \current, next ->
-            f(a(current, next), b(current, next));
+        \current, next, previous ->
+            f(a(current, next, previous), b(current, next, previous));
     
 /**
  * Are two policies both satisfied?
@@ -103,11 +103,11 @@ any = args \>> anya;
 /**
  * 
  */
-breakpoint = \current{breakpoints}, next ->
+breakpoint = \current{breakpoints}, next, previous ->
     anya(
         map(
             \b -> breakpoints[b].test.bind(b),
-            Object.keys(breakpoints)))(current, next);
+            Object.keys(breakpoints)))(current, next, previous);
 
 /* Depth Policies
  ******************************************************************************/

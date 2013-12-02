@@ -81,7 +81,6 @@ in
         suc,
         \_, _ -> def);
 
-
 /**
  * Evaluate `p` in the given debug context and return the next debug context
  * resulting from evaluation.

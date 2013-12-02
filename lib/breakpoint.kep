@@ -49,8 +49,8 @@ create = Breakpoint.create;
 unconditional = \line ->
     and(
         statementDgr,
-        \current, next ->
-            extract(current, context.location, false,
+        \current, next, previous ->
+            extract(previous, context.location, false,
                 \currentLocation ->
                     extract(next, context.location, false,
                         \nextLocation ->

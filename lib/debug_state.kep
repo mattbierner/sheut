@@ -25,7 +25,7 @@ DebugState = record.declare(null, [
     'ctx',
     'complete',
     'depth'],
-    function(dgr, k, ctx, complete) {
+    function(dgr, k, ctx, complete, previousLocation) {
         this.dgr = dgr;
         this.k = k;
         this.ctx = ctx;
