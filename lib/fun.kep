@@ -26,12 +26,9 @@ args = \args(...) -> args;
 
 constant = \x -> \() -> x;
 
-compose = \f, g -> {
-    if (!f || !g)
-        debugger;
-    return \args(...) ->
+compose = \f, g -> 
+    \args(...) ->
         f(g.apply(undefined, args));
-};
 
 call = \args(f, ...) ->
     Function.prototype.call.apply(f, args);
@@ -40,8 +37,8 @@ apply = \f, args ->
     Function.prototype.apply.apply(f, args);
 
 flip = \f ->
-    \x, y ->
-        f.call(undefined, y, x);
+    \x, y -> f(y, x);
+
 /* 
  ******************************************************************************/
 concat = \args(...) ->

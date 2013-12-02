@@ -9,8 +9,9 @@ package (
 with
     import 'atum/compute/statement' statement,
     import 'atum/compute/program' program,
+    import 'atum/interpret' interpret,
     
-    import 'sheut/debug' {debug, 'execute': executeProgram},
+    import 'sheut/debug' {debugInitial, debug, 'execute': executeProgram},
     import 'sheut/state' {getResult}
 in {
 
@@ -25,7 +26,8 @@ var finish = \args(...) -> {
     }
 };
 
-
+/* Running
+ ******************************************************************************/
 /**
  * Run `p` in provide debug context.
  * 
@@ -36,16 +38,10 @@ var finish = \args(...) -> {
  * @param ok Success continuation.
  * @param err Failure continuation.
  */
-execute = \d, p, ok, err -> let
-    result = finish(
-        debug(
-            d,
-            program.liftStatement(statement.liftExpression(p)),
-            d.debug.ctx,
-            \x, ctx -> \d -> ok(x, ctx, d),
-            \x, ctx -> \d -> err(x, ctx, d)))
-in
-    getResult(result)(result);
+execute = \d, p, ok, err ->
+    (debugInitial(p, d.debug.ctx, ok, err)
+        |> finish
+        |> getResult);
 
 /**
  * Evaluate `p` in the given debug context,
@@ -61,7 +57,6 @@ evaluate = \d, p, ok, err ->
         (ok || ret),
         (err || thr));
 
-
 /**
  * Evaluate `p` in the given debug context and return the result.
  * 
@@ -72,13 +67,11 @@ evaluate = \d, p, ok, err ->
  * @param [def] Default value to return when `p` fails.
  * @param [ok] Optional callback to pass the result successful result through before returning it.
  */
-extract = \d, p, def, ok -> let
-    suc = (ok || ret)
-in
+extract = \d, p, def, ok ->
     execute(
         d,
         p,
-        suc,
+        (ok || ret),
         \_, _ -> def);
 
 /**
@@ -91,12 +84,7 @@ in
  * @param [err] Failure completion.
  */
 transform = \d, p, ok, err ->
-    finish(
-        debug(
-            d,
-            p,
-            d.debug.ctx,
-            ok,
-            err)).debug;
+    (debugInitial(p, d.debug.ctx, ok, err)
+        |> finish);
 
 }
