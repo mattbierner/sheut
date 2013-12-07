@@ -24,6 +24,9 @@ in {
 var containsLine = \location, line ->
     (location.start.line <= line && line <= location.end.line);
 
+var hasLine = \location, line ->
+    (location.start.line === line);
+
 /* Breakpoint
  ******************************************************************************/
 /**
@@ -54,9 +57,9 @@ unconditional = \line ->
                 \currentLocation ->
                     extract(next, context.location, false,
                         \nextLocation ->
-                            ((!currentLocation || !containsLine(currentLocation, line)) &&
+                            ((!currentLocation || !hasLine(currentLocation, line)) &&
                                 nextLocation &&
-                                containsLine(nextLocation, line)))));
+                                hasLine(nextLocation, line)))));
 
 /**
  * Test for a breakpoint that conditionally breaks when a condition is satisfied.

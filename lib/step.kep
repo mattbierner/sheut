@@ -35,8 +35,6 @@ var abrupt = policy.all(
 
 /* Basic Operations
  ******************************************************************************/
-/**
- */
 var nextContext = \s ->
     (s.complete ? s :
         let c = trampoline(s.k(null, s.ctx)) in
@@ -55,7 +53,7 @@ next = \d ->
 /**
  * Step while `policy` is satisfied.
  * 
- * @param policy Binary predicate taking current and next state that determines
+ * @param policy Predicate taking current and next state that determines
  *    when to stop stepping.
  * @param d Debugger.
  */

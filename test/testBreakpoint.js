@@ -101,6 +101,7 @@ function(breakpoint,
                     run.extract(d2, evaluate.evaluateInput("x")).value,
                     4);
             }],
+            /* Temp disabling this behavior until a better solutation can be found.
             ["multi line expression hits on first line once",
             function(){
                 var d = debug.beginInitialInput("var x = [56]; x = [0, \n 1, \n 2, 3, \n 4];");
@@ -120,6 +121,24 @@ function(breakpoint,
                 assert.equal(
                     run.extract(d2, evaluate.evaluateInput("x.length")).value,
                     5);
+            }],
+            */
+            ["Nested Statement breakpoint",
+            function(){
+                var d = debug.beginInitialInput("var x = 0; { \n x = 1; \n x = 2; \n x = 3 \n }");
+                
+                var bp = breakpoint.create(breakpoint.unconditional(3));
+                d = state.addBreakpoint(d, 0, bp);
+                
+                var d1 = step.run(d);
+                assert.equal(
+                    run.extract(d1, evaluate.evaluateInput("x")).value,
+                    1);
+
+                var d2 = step.run(d1);
+                assert.equal(
+                    run.extract(d2, evaluate.evaluateInput("x")).value,
+                    3);
             }],
             
             ["Basic conditional bp",
