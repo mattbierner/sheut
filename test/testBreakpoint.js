@@ -101,7 +101,7 @@ function(breakpoint,
                     run.extract(d2, evaluate.evaluateInput("x")).value,
                     4);
             }],
-            /* Temp disabling this behavior until a better solutation can be found.
+            /* Temp disabling this behavior until a better solution can be found.
             ["multi line expression hits on first line once",
             function(){
                 var d = debug.beginInitialInput("var x = [56]; x = [0, \n 1, \n 2, 3, \n 4];");

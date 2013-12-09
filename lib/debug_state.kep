@@ -2,7 +2,9 @@
  * @fileOverview
  */
 package (
-    DebugState)
+    DebugState,
+    
+    inject)
 with
     import 'amulet/record' record
 in {
@@ -32,5 +34,8 @@ DebugState = record.declare(null, [
         this.complete = complete;
         this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
     });
+
+inject = \source, result ->
+    source.setCtx(source.ctx.setValues(result.ctx.values));
 
 }
