@@ -2,8 +2,7 @@
  * THIS FILE IS AUTO GENERATED from 'lib/debug_state.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "amulet/record", "sheut/semantics/debug/debuggable"], (function(require, exports, record,
-    __o) {
+define(["require", "exports", "amulet/record", "sheut/interpreter/debuggable"], (function(require, exports, record, __o) {
     "use strict";
     var DebugState, isComplete, inject;
     var record = record,

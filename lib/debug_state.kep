@@ -10,7 +10,7 @@ package (
 with
     import 'amulet/record' record,
     
-    import 'sheut/semantics/debug/debuggable' {CompleteDebuggable}
+    import 'sheut/interpreter/debuggable' {CompleteDebuggable}
 in {
 
 /* DebugState

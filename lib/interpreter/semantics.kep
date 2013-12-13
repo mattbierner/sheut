@@ -26,8 +26,8 @@ with
     import 'atum/semantics/semantics' semantics,
     import 'atum/semantics/value' value_semantics,
     
-    import 'sheut/semantics/debug/debuggable' atum_debuggable,
-    import 'sheut/semantics/debug/operations' debug,
+    import 'sheut/interpreter/debuggable' atum_debuggable,
+    import 'sheut/interpreter/operations' debug,
     
     import 'sheut/fun' fun
 in {

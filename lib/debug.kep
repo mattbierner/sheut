@@ -27,8 +27,8 @@ with
     
     import 'ecma/parse/parser' {parse},
     
-    import 'sheut/semantics/semantics' semantics,
-    import 'sheut/semantics/debug/debuggable' {CompleteDebuggable},
+    import 'sheut/interpreter/semantics' semantics,
+    import 'sheut/interpreter/debuggable' {CompleteDebuggable},
 
     import 'sheut/debug_state' {DebugState},
     import 'sheut/state' {Debugger}

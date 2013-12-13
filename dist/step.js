@@ -2,7 +2,7 @@
  * THIS FILE IS AUTO GENERATED from 'lib/step.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "atum/compute/tail", "sheut/semantics/debug/debuggable", "sheut/debug_state", "sheut/fun",
+define(["require", "exports", "atum/compute/tail", "sheut/interpreter/debuggable", "sheut/debug_state", "sheut/fun",
     "sheut/policy"
 ], (function(require, exports, __o, __o0, __o1, __o2, policy) {
     "use strict";

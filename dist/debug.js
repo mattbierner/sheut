@@ -4,7 +4,7 @@
 */
 define(["require", "exports", "atum/compute", "atum/compute/context", "atum/compute/statement", "atum/compute/program",
     "atum/interpret", "atum/operations/evaluation", "atum/builtin/impl/global", "atum/builtin/operations/global",
-    "ecma/parse/parser", "sheut/semantics/semantics", "sheut/semantics/debug/debuggable", "sheut/debug_state",
+    "ecma/parse/parser", "sheut/interpreter/semantics", "sheut/interpreter/debuggable", "sheut/debug_state",
     "sheut/state"
 ], (function(require, exports, compute, __o, statement, program, interpret, __o0, global, globalOps, __o1,
     semantics, __o2, __o3, __o4) {

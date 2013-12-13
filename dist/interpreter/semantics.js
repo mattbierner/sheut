@@ -1,11 +1,11 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/semantics/semantics.kep'
+ * THIS FILE IS AUTO GENERATED from 'lib/interpreter/semantics.kep'
  * DO NOT EDIT
 */
 define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/operations/execution_context",
     "atum/semantics/declaration", "atum/semantics/expression", "atum/semantics/func", "atum/semantics/program",
-    "atum/semantics/semantics", "atum/semantics/value", "sheut/semantics/debug/debuggable",
-    "sheut/semantics/debug/operations", "sheut/fun"
+    "atum/semantics/semantics", "atum/semantics/value", "sheut/interpreter/debuggable",
+    "sheut/interpreter/operations", "sheut/fun"
 ], (function(require, exports, compute, statement, execution_context, declaration_semantics, expression_semantics,
     function_semantics, program_semantics, semantics, value_semantics, atum_debuggable, debug, fun) {
     "use strict";

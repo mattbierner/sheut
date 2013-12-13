@@ -1,5 +1,5 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/semantics/debug/debuggable.kep'
+ * THIS FILE IS AUTO GENERATED from 'lib/interpreter/debuggable.kep'
  * DO NOT EDIT
 */
 define(["require", "exports", "amulet/record"], (function(require, exports, record) {
