@@ -39,13 +39,13 @@ var containsLine = \location, line ->
 
 /* Basic Policies
  ******************************************************************************/
-always = constant(true);
+always =  \_, next, _ -> next;
 
-never = constant(false);
+never = \_, _, _ -> null;
 
 var testNext = \f ->
     \_, next ->
-        f(next.debug);
+        f(next.debug) ? next : null;
 
 notComplete = testNext(\d -> !d.complete);
 
@@ -62,7 +62,7 @@ not = \p -> (p \>>(!));
 var binary = \f ->
     \a, b ->
         \current, next, previous ->
-            f(a(current, next, previous), b(current, next, previous));
+            f(a(current, next, previous), b(current, next, previous)) ? next : null;
     
 /**
  * Are two policies both satisfied?

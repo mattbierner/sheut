@@ -2,9 +2,15 @@
  * THIS FILE IS AUTO GENERATED from 'lib/operations/context.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "atum/compute", "atum/context/environment", "atum/semantics/expression", "atum/operations/environment", "atum/operations/execution_context", "atum/operations/internal_reference", "atum/operations/object", "atum/operations/string", "sheut/operations/reference", "atum/operations/type_conversion"], (function(require, exports, compute, __o, __o0, environment_ops, execution_context, internal_reference, object, string, __o1, __o2) {
+define(["require", "exports", "atum/compute", "atum/context/environment", "atum/semantics/expression",
+    "atum/operations/environment", "atum/operations/execution_context", "atum/operations/internal_reference",
+    "atum/operations/object", "atum/operations/string", "sheut/operations/reference",
+    "atum/operations/type_conversion"
+], (function(require, exports, compute, __o, __o0, environment_ops, execution_context, internal_reference, object,
+    string, __o1, __o2) {
     "use strict";
-    var context, environment, getEnvironmentBindings, getEnvironmentOuter, getEnvironmentBinding, location, stack, getStackFrameName;
+    var context, environment, getEnvironmentBindings, getEnvironmentOuter, getEnvironmentBinding, location,
+            stack, getStackFrameName;
     var compute = compute,
         bind = compute["bind"],
         just = compute["just"],
@@ -29,9 +35,10 @@ define(["require", "exports", "atum/compute", "atum/context/environment", "atum/
         return bind(getValue(env), (function(env) {
             var env = env,
                 record = env["record"];
-            return ((env instanceof ObjectLexicalEnvironment) ? compute.bind(getValue(record), (function(obj) {
-                return just(Object.keys(obj.properties));
-            })) : just(Object.keys(record)));
+            return ((env instanceof ObjectLexicalEnvironment) ? compute.bind(getValue(record), (
+                function(obj) {
+                    return just(Object.keys(obj.properties));
+                })) : just(Object.keys(record)));
         }));
     }));
     (getEnvironmentOuter = (function(env) {
@@ -58,15 +65,17 @@ define(["require", "exports", "atum/compute", "atum/context/environment", "atum/
         return m.stack;
     })));
     (getStackFrameName = (function() {
-        {
-            var anon = string.create("[Anonymous Function]");
-            return (function(frame) {
-                var frame = frame,
-                    func = frame["func"];
-                return compute.branch(object.hasProperty(func, "name"), logicalOr(compute.bind(object.get(func, "name"), toString), anon), anon);
-            });
-        }
-    })());
+            {
+                var anon = string.create("[Anonymous Function]");
+                return (function(frame) {
+                    var frame = frame,
+                        func = frame["func"];
+                    return compute.branch(object.hasProperty(func, "name"), logicalOr(compute.bind(
+                        object.get(func, "name"), toString), anon), anon);
+                });
+            }
+        })
+        .call(this));
     (exports.context = context);
     (exports.environment = environment);
     (exports.getEnvironmentBindings = getEnvironmentBindings);

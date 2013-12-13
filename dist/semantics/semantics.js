@@ -2,7 +2,12 @@
  * THIS FILE IS AUTO GENERATED from 'lib/semantics/semantics.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/operations/execution_context", "atum/semantics/declaration", "atum/semantics/expression", "atum/semantics/func", "atum/semantics/program", "atum/semantics/semantics", "atum/semantics/value", "sheut/semantics/debug/debuggable", "sheut/semantics/debug/operations", "sheut/fun"], (function(require, exports, compute, statement, execution_context, declaration_semantics, expression_semantics, function_semantics, program_semantics, semantics, value_semantics, atum_debuggable, debug, fun) {
+define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/operations/execution_context",
+    "atum/semantics/declaration", "atum/semantics/expression", "atum/semantics/func", "atum/semantics/program",
+    "atum/semantics/semantics", "atum/semantics/value", "sheut/semantics/debug/debuggable",
+    "sheut/semantics/debug/operations", "sheut/fun"
+], (function(require, exports, compute, statement, execution_context, declaration_semantics, expression_semantics,
+    function_semantics, program_semantics, semantics, value_semantics, atum_debuggable, debug, fun) {
     "use strict";
     var sourceElements, declarations, program, programBody, mapSemantics;
     var compute = compute,
@@ -20,9 +25,9 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
     var isStrict = (function(elems) {
         if (((elems && elems.length) && (elems[0].type === "ExpressionStatement"))) {
             var first = elems[0].expression;
-            return (((first && (first.type === "Literal")) && (first.kind === "string")) && (first.value === "use strict"));
+            return (((first && (first.type === "Literal")) && (first.kind === "string")) && (first.value ===
+                "use strict"));
         }
-
         return false;
     });
     var input = (function(loc, body) {
@@ -34,7 +39,6 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
     }));
     (declarations = (function(node) {
         if (!node) return compute.empty;
-
         switch (node.type) {
             case "SwitchCase":
                 return compute.sequencea(fun.map(declarations, node.consequent));
@@ -47,7 +51,8 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
             case "SwitchStatement":
                 return compute.sequencea(fun.map(declarations, node.cases));
             case "TryStatement":
-                return compute.sequence(declarations(node.block), declarations(node.handler), declarations(node.finalizer));
+                return compute.sequence(declarations(node.block), declarations(node.handler),
+                    declarations(node.finalizer));
             case "WithStatement":
             case "WhileStatement":
             case "DoWhileStatement":
@@ -64,9 +69,11 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
                                 return x.name;
                             }), node.params),
                             strict = isStrict(node.body.body);
-                        return declaration_semantics.functionDeclaration(id, strict, params, node.body, declarations(node.body), mapSemantics(node.body));
+                        return declaration_semantics.functionDeclaration(id, strict, params, node.body,
+                            declarations(node.body), mapSemantics(node.body));
                     }
-                })();
+                })
+                    .call(this);
             case "VariableDeclaration":
                 return declaration_semantics.variableDeclaration(fun.map(declarations, node.declarations));
             case "VariableDeclarator":
@@ -100,7 +107,8 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
     var whileStatement = debuggableStatement(semantics.whileStatement);
     var doWhileStatement = debuggableStatement(semantics.doWhileStatement);
     var forStatement = debuggableStatement((function(init, test, update, body) {
-        return semantics.forStatement(debug.debuggable(init), debug.debuggable(test), debug.debuggable(update), body);
+        return semantics.forStatement(debug.debuggable(init), debug.debuggable(test), debug.debuggable(
+            update), body);
     }));
     var forInStatement = debuggableStatement(semantics.forInStatement);
     var forVarInStatement = debuggableStatement(semantics.forVarInStatement);
@@ -124,7 +132,8 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
     var objectExpression = semantics.objectExpression;
     var functionExpression = semantics.functionExpression;
     (sourceElements = (function(elems) {
-        return program_semantics.sourceElements(isStrict(elems), fun.map(declarations, elems), fun.map(mapSemantics, elems));
+        return program_semantics.sourceElements(isStrict(elems), fun.map(declarations, elems), fun.map(
+            mapSemantics, elems));
     }));
     (program = program_semantics.program);
     (programBody = program_semantics.programBody);
@@ -152,7 +161,8 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
                 case "ExpressionStatement":
                     return expressionStatement(mapSemantics(node.expression));
                 case "IfStatement":
-                    return ifStatement(mapSemantics(node.test), mapSemantics(node.consequent), mapSemantics(node.alternate));
+                    return ifStatement(mapSemantics(node.test), mapSemantics(node.consequent),
+                        mapSemantics(node.alternate));
                 case "LabeledStatement":
                     break;
                 case "BreakStatement":
@@ -166,19 +176,24 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
                 case "WithStatement":
                     return withStatement(mapSemantics(node.object), mapSemantics(node.body));
                 case "SwitchStatement":
-                    return switchStatement(mapSemantics(node.discriminant), fun.map(mapSemantics, node.cases));
+                    return switchStatement(mapSemantics(node.discriminant), fun.map(mapSemantics,
+                        node.cases));
                 case "TryStatement":
-                    return tryStatement(mapSemantics(node.block), (node.handler && node.handler.param), mapSemantics(node.handler), mapSemantics(node.finalizer));
+                    return tryStatement(mapSemantics(node.block), (node.handler && node.handler.param),
+                        mapSemantics(node.handler), mapSemantics(node.finalizer));
                 case "WhileStatement":
                     return whileStatement(mapSemantics(node.test), mapSemantics(node.body));
                 case "DoWhileStatement":
                     return doWhileStatement(mapSemantics(node.body), mapSemantics(node.test));
                 case "ForStatement":
-                    return forStatement(mapSemantics(node.init), mapSemantics(node.test), mapSemantics(node.update), mapSemantics(node.body));
+                    return forStatement(mapSemantics(node.init), mapSemantics(node.test),
+                        mapSemantics(node.update), mapSemantics(node.body));
                 case "ForInStatement":
-                    if ((node.left.type === "VariableDeclaration")) return forVarInStatement(node.left.declarations[0].id.name, mapSemantics(node.right), mapSemantics(node.body));
-
-                    return forInStatement(mapSemantics(node.left), mapSemantics(node.right), mapSemantics(node.body));
+                    if ((node.left.type === "VariableDeclaration")) return forVarInStatement(node.left
+                        .declarations[0].id.name, mapSemantics(node.right), mapSemantics(node.body)
+                    );
+                    return forInStatement(mapSemantics(node.left), mapSemantics(node.right),
+                        mapSemantics(node.body));
                 case "ThisExpression":
                     return thisExpression;
                 case "SequenceExpression":
@@ -188,25 +203,32 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
                 case "UpdateExpression":
                     return updateExpression(node.operator, node.prefix, mapSemantics(node.argument));
                 case "BinaryExpression":
-                    return binaryExpression(node.operator, mapSemantics(node.left), mapSemantics(node.right));
+                    return binaryExpression(node.operator, mapSemantics(node.left), mapSemantics(
+                        node.right));
                 case "LogicalExpression":
-                    return logicalExpression(node.operator, mapSemantics(node.left), mapSemantics(node.right));
+                    return logicalExpression(node.operator, mapSemantics(node.left), mapSemantics(
+                        node.right));
                 case "AssignmentExpression":
-                    return assignmentExpression(node.operator, mapSemantics(node.left), mapSemantics(node.right));
+                    return assignmentExpression(node.operator, mapSemantics(node.left),
+                        mapSemantics(node.right));
                 case "ConditionalExpression":
-                    return conditionalExpression(mapSemantics(node.test), mapSemantics(node.consequent), mapSemantics(node.alternate));
+                    return conditionalExpression(mapSemantics(node.test), mapSemantics(node.consequent),
+                        mapSemantics(node.alternate));
                 case "NewExpression":
                     return newExpression(mapSemantics(node.callee), fun.map(mapSemantics, node.args));
                 case "CallExpression":
                     return callExpression(mapSemantics(node.callee), fun.map(mapSemantics, node.args));
                 case "MemberExpression":
-                    return (node.computed ? computedMemberExpression(mapSemantics(node.object), mapSemantics(node.property)) : memberExpression(mapSemantics(node.object), node.property));
+                    return (node.computed ? computedMemberExpression(mapSemantics(node.object),
+                        mapSemantics(node.property)) : memberExpression(mapSemantics(node.object),
+                        node.property));
                 case "ArrayExpression":
                     return arrayExpression(fun.map(mapSemantics, node.elements));
                 case "ObjectExpression":
                     return objectExpression(node.properties);
                 case "FunctionExpression":
-                    return functionExpression(node.id, node.params, node.body, declarations(node.body), mapSemantics(node.body));
+                    return functionExpression(node.id, node.params, node.body, declarations(node.body),
+                        mapSemantics(node.body));
                 case "FunctionDeclaration":
                     return statement.empty;
                 case "Program":
@@ -224,9 +246,7 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
         });
         return (function(node) {
             if (!node) return node;
-
             if (Array.isArray(node)) return fun.map(mapSemantics, node);
-
             var result = mapper(node);
             return ((typeof result === "function") ? input(node.loc, result) : result);
         });

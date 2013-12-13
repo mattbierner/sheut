@@ -4,6 +4,8 @@
 package (
     DebugState,
     
+    isComplete,
+    
     inject)
 with
     import 'amulet/record' record
@@ -35,7 +37,12 @@ DebugState = record.declare(null, [
         this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
     });
 
+isComplete = \dgr ->
+    (dgr && dgr.complete);
+
 inject = \source, result ->
     source.setCtx(source.ctx.setValues(result.ctx.values));
 
+    
+    
 }

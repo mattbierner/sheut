@@ -22,7 +22,7 @@ with
     import 'atum/compute/tail' {trampoline},
     import 'sheut/semantics/debug/debuggable' {Debuggable},
     
-    import 'sheut/debug_state' {DebugState},
+    import 'sheut/debug_state' {DebugState, isComplete},
     import 'sheut/fun' {foldl, args},
     import 'sheut/policy' policy {notComplete, not, and, all, or, any, sameLine}
 in {
@@ -36,7 +36,7 @@ var abrupt = policy.all(
 /* Basic Operations
  ******************************************************************************/
 var nextContext = \s ->
-    (s.complete ? s :
+    (isComplete(s) ? s :
         let c = trampoline(s.k(null, s.ctx)) in
             (c instanceof Debuggable ?
                 DebugState.create(c, c.k, c.ctx, false) :
@@ -53,17 +53,17 @@ next = \d ->
 /**
  * Step while `policy` is satisfied.
  * 
- * @param policy Predicate taking current and next state that determines
- *    when to stop stepping.
+ * @param policy
  * @param d Debugger.
  */
 nextWhile = \policy, d -> {
-    var c = d;
-    var previous;
+    var n = d;
+    var c, previous;
     do {
         previous = c;
-        c = next(c);
-    } while (policy(d, c, previous));
+        c = next(n);
+        n = policy(d, c, previous);
+    } while (n);
     return c;
 };
 
