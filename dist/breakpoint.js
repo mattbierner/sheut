@@ -48,9 +48,9 @@ define(["require", "exports", "amulet/record", "atum/compute", "atum/compute/pro
         return (function() {
             {
                 var condition = bind(prog, isTrue);
-                return test((function(_, next) {
+                return and(statementDgr, test((function(_, next) {
                     return extract(next, condition, false);
-                }));
+                })));
             }
         })
             .call(this);

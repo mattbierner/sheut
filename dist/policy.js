@@ -6,7 +6,7 @@ define(["require", "exports", "sheut/interpreter/debuggable", "sheut/fun", "sheu
     function(require, exports, debuggable, __o, __o0, context) {
         "use strict";
         var test, always, never, notComplete, not, and, or, all, any, breakpoint, depthGt, depthGte, depthEq,
-                debuggerDgr, statementDgr, line, sameLine;
+                debuggerDgr, statementDgr, abrupt, line, sameLine;
         var debuggable = debuggable,
             __o = __o,
             foldl = __o["foldl"],
@@ -108,6 +108,7 @@ define(["require", "exports", "sheut/interpreter/debuggable", "sheut/fun", "sheu
         (debuggerDgr = dgrInstanceof(debuggable.DebuggerDebuggable));
         (statementDgr = dgrInstanceof(debuggable.StatementDebuggable));
         var callDgr = or(dgrInstanceof(debuggable.PreCallDebuggable), dgrInstanceof(debuggable.PostCallDebuggable));
+        (abrupt = any(debuggerDgr, breakpoint));
         (line = (function(line) {
             return (function(_, next) {
                 return extract(next, context.location, false, (function(nextLocation) {
@@ -138,6 +139,7 @@ define(["require", "exports", "sheut/interpreter/debuggable", "sheut/fun", "sheu
         (exports.depthEq = depthEq);
         (exports.debuggerDgr = debuggerDgr);
         (exports.statementDgr = statementDgr);
+        (exports.abrupt = abrupt);
         (exports.line = line);
         (exports.sameLine = sameLine);
     }))

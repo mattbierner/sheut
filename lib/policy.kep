@@ -21,6 +21,7 @@ package (
     
     debuggerDgr,
     statementDgr,
+    abrupt,
     
     line,
     sameLine)
@@ -150,6 +151,13 @@ statementDgr = dgrInstanceof(debuggable.StatementDebuggable);
 var callDgr = or(
     dgrInstanceof(debuggable.PreCallDebuggable),
     dgrInstanceof(debuggable.PostCallDebuggable));
+
+/* Policies
+ ******************************************************************************/
+abrupt = any(
+    debuggerDgr,
+    breakpoint);
+
 
 /* Location
  ******************************************************************************/

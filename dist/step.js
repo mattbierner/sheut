@@ -18,6 +18,7 @@ define(["require", "exports", "atum/compute/tail", "sheut/interpreter/debuggable
         foldl = __o2["foldl"],
         args = __o2["args"],
         policy = policy,
+        abrupt = policy["abrupt"],
         notComplete = policy["notComplete"],
         not = policy["not"],
         and = policy["and"],
@@ -25,7 +26,6 @@ define(["require", "exports", "atum/compute/tail", "sheut/interpreter/debuggable
         or = policy["or"],
         any = policy["any"],
         sameLine = policy["sameLine"];
-    var abrupt = policy.any(policy.debuggerDgr, policy.breakpoint);
     var nextContext = (function(s) {
         return (isComplete(s) ? s : createForDgr(trampoline(s.k(null, s.ctx))));
     });

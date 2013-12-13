@@ -24,14 +24,8 @@ with
     
     import 'sheut/debug_state' {createForDgr, isComplete},
     import 'sheut/fun' {foldl, args},
-    import 'sheut/policy' policy {notComplete, not, and, all, or, any, sameLine}
+    import 'sheut/policy' policy {abrupt, notComplete, not, and, all, or, any, sameLine}
 in {
-
-/* Policies
- ******************************************************************************/
-var abrupt = policy.any(
-    policy.debuggerDgr,
-    policy.breakpoint);
 
 /* Basic Operations
  ******************************************************************************/

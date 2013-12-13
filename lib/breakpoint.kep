@@ -67,7 +67,9 @@ unconditional = \line ->
 conditional = \prog -> let
     condition = bind(prog, isTrue)
 in
-    test <|\_, next ->
-        extract(next, condition, false);
+    and(
+        statementDgr,
+        test <|\_, next ->
+            extract(next, condition, false));
 
 }
