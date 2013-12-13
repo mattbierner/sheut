@@ -29,18 +29,16 @@ in {
 
 /* Policies
  ******************************************************************************/
-var abrupt = policy.all(
-    not(policy.debuggerDgr),
-    not(policy.breakpoint));
+var abrupt = policy.any(
+    policy.debuggerDgr,
+    policy.breakpoint);
 
 /* Basic Operations
  ******************************************************************************/
 var nextContext = \s ->
     (isComplete(s) ? s :
         let c = trampoline(s.k(null, s.ctx)) in
-            (c instanceof Debuggable ?
-                DebugState.create(c, c.k, c.ctx, false) :
-                c));
+            DebugState.create(c, c.k, c.ctx, false));
 
 /**
  * Perform a single step to the next debuggable in the program.
@@ -92,7 +90,7 @@ stepNextLine = (nextWhile,
         any(
             not <| policy.statementDgr,
             policy.depthEq),
-        abrupt));
+        not <| abrupt));
 
 /**
  * Step to completion.
@@ -106,7 +104,7 @@ finish = (nextWhile,
 run = (nextWhile,
     all(
         notComplete,
-        abrupt));
+        not <| abrupt));
 
 /**
  * Step over a function call.
@@ -120,7 +118,7 @@ stepOver = (nextWhile,
         any(
             policy.depthGt,
             not <| policy.statementDgr),
-        abrupt));
+        not <| abrupt));
 
 /**
  * Step out of a function call.
@@ -135,7 +133,7 @@ stepOut = (nextWhile,
     all(
         notComplete,
         policy.depthGte,
-        abrupt));
+        not <| abrupt));
 
 /* Step Combinators
  ******************************************************************************/

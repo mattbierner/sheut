@@ -28,6 +28,7 @@ with
     import 'ecma/parse/parser' {parse},
     
     import 'sheut/semantics/semantics' semantics,
+    import 'sheut/semantics/debug/debuggable' {CompleteDebuggable},
 
     import 'sheut/debug_state' {DebugState},
     import 'sheut/state' {Debugger}
@@ -113,9 +114,9 @@ debug = \d, p, ctx, ok, err -> let
     suc = (ok || ret),
     fail = (err || thr),
     pok = \x, ctx ->
-        DebugState.create(null, suc(x, ctx), ctx, true),
+        CompleteDebuggable.create(suc(x, ctx), ctx),
     perr = \x, ctx ->
-        DebugState.create(null, fail(x, ctx), ctx, true)
+        CompleteDebuggable.create(fail(x, ctx), ctx)
 in
     execute(
         d,

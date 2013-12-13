@@ -4,11 +4,13 @@
 */
 define(["require", "exports", "amulet/record"], (function(require, exports, record) {
     "use strict";
-    var Debuggable, StatementDebuggable, ExpressionDebuggable, DebuggerDebuggable, PreCallDebuggable,
-            PostCallDebuggable;
+    var Debuggable, CompleteDebuggable, StatementDebuggable, ExpressionDebuggable, DebuggerDebuggable,
+            PreCallDebuggable, PostCallDebuggable;
     var record = record;
     (Debuggable = record.declare(null, ["k", "ctx"]));
     (Debuggable.type = "Debuggable");
+    (CompleteDebuggable = record.extend(Debuggable, []));
+    (CompleteDebuggable.type = "Complete");
     (StatementDebuggable = record.extend(Debuggable, []));
     (StatementDebuggable.type = "Statement");
     (ExpressionDebuggable = record.extend(Debuggable, []));
@@ -20,6 +22,7 @@ define(["require", "exports", "amulet/record"], (function(require, exports, reco
     (PostCallDebuggable = record.extend(Debuggable, []));
     (PostCallDebuggable.type = "PostCall");
     (exports.Debuggable = Debuggable);
+    (exports.CompleteDebuggable = CompleteDebuggable);
     (exports.StatementDebuggable = StatementDebuggable);
     (exports.ExpressionDebuggable = ExpressionDebuggable);
     (exports.DebuggerDebuggable = DebuggerDebuggable);

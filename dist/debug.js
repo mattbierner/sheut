@@ -4,9 +4,10 @@
 */
 define(["require", "exports", "atum/compute", "atum/compute/context", "atum/compute/statement", "atum/compute/program",
     "atum/interpret", "atum/operations/evaluation", "atum/builtin/impl/global", "atum/builtin/operations/global",
-    "ecma/parse/parser", "sheut/semantics/semantics", "sheut/debug_state", "sheut/state"
+    "ecma/parse/parser", "sheut/semantics/semantics", "sheut/semantics/debug/debuggable", "sheut/debug_state",
+    "sheut/state"
 ], (function(require, exports, compute, __o, statement, program, interpret, __o0, global, globalOps, __o1,
-    semantics, __o2, __o3) {
+    semantics, __o2, __o3, __o4) {
     "use strict";
     var initialize, debug, debugInitial, beginInitial, begin, beginInitialProgram, beginProgram,
             beginInitialInput, beginInput;
@@ -26,9 +27,11 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
         parse = __o1["parse"],
         semantics = semantics,
         __o2 = __o2,
-        DebugState = __o2["DebugState"],
+        CompleteDebuggable = __o2["CompleteDebuggable"],
         __o3 = __o3,
-        Debugger = __o3["Debugger"];
+        DebugState = __o3["DebugState"],
+        __o4 = __o4,
+        Debugger = __o4["Debugger"];
     var memo = (function(f) {
         var val;
         return (function() {
@@ -72,10 +75,10 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
                 var suc = (ok || ret),
                     fail = (err || thr),
                     pok = (function(x, ctx) {
-                        return DebugState.create(null, suc(x, ctx), ctx, true);
+                        return CompleteDebuggable.create(suc(x, ctx), ctx);
                     }),
                     perr = (function(x, ctx) {
-                        return DebugState.create(null, fail(x, ctx), ctx, true);
+                        return CompleteDebuggable.create(fail(x, ctx), ctx);
                     });
                 return execute(d, p, ctx, pok, perr);
             }
@@ -91,9 +94,9 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
     (beginInitial = (function(p, ok, err) {
         return debug(Debugger.initial, p, getGlobalContext(), ok, err);
     }));
-    (beginProgram = (function(d, __o4, ok, err) {
-        var __o4 = __o4,
-            body = __o4["body"];
+    (beginProgram = (function(d, __o5, ok, err) {
+        var __o5 = __o5,
+            body = __o5["body"];
         return begin(d, semantics.programBody(semantics.sourceElements(body)), ok, err);
     }));
     (beginInitialProgram = (function(prog, ok, err) {

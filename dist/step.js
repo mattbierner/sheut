@@ -25,12 +25,12 @@ define(["require", "exports", "atum/compute/tail", "sheut/semantics/debug/debugg
         or = policy["or"],
         any = policy["any"],
         sameLine = policy["sameLine"];
-    var abrupt = policy.all(not(policy.debuggerDgr), not(policy.breakpoint));
+    var abrupt = policy.any(policy.debuggerDgr, policy.breakpoint);
     var nextContext = (function(s) {
         return (isComplete(s) ? s : (function() {
                 {
                     var c = trampoline(s.k(null, s.ctx));
-                    return ((c instanceof Debuggable) ? DebugState.create(c, c.k, c.ctx, false) : c);
+                    return DebugState.create(c, c.k, c.ctx, false);
                 }
             })
             .call(this));
@@ -51,11 +51,11 @@ define(["require", "exports", "atum/compute/tail", "sheut/semantics/debug/debugg
     }));
     (step = nextWhile.bind(null, and(notComplete, not(policy.statementDgr))));
     (stepNextLine = nextWhile.bind(null, all(notComplete, sameLine, any(not(policy.statementDgr), policy.depthEq),
-        abrupt)));
+        not(abrupt))));
     (finish = nextWhile.bind(null, notComplete));
-    (run = nextWhile.bind(null, all(notComplete, abrupt)));
-    (stepOver = nextWhile.bind(null, all(notComplete, any(policy.depthGt, not(policy.statementDgr)), abrupt)));
-    (stepOut = nextWhile.bind(null, all(notComplete, policy.depthGte, abrupt)));
+    (run = nextWhile.bind(null, all(notComplete, not(abrupt))));
+    (stepOver = nextWhile.bind(null, all(notComplete, any(policy.depthGt, not(policy.statementDgr)), not(abrupt))));
+    (stepOut = nextWhile.bind(null, all(notComplete, policy.depthGte, not(abrupt))));
     (sequencea = (function(steps) {
         return (function(d) {
             return foldl((function(p, c) {

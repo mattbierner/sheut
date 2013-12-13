@@ -8,7 +8,7 @@ package (
     debuggableStatement,
     debuggableCall)
 with
-    import 'atum/compute' compute,
+    import 'atum/compute' {abrupt, bind, callcc, computeContext, just, next},
     import 'sheut/semantics/debug/debuggable' atum_debuggable
 in {
 
@@ -17,34 +17,22 @@ in {
 /**
  * 
  */
-debug = function(p, f) {
-    return compute.bind(
-        compute.computeContext,
-        function(ctx) {
-            return compute.next(compute.callcc(function(k) {
-                return compute.abrupt(f(k, ctx));
-            }), p);
-        });
-};
+debug = \p, f ->
+    bind(computeContext, \ctx ->
+        next(
+            callcc(\k -> abrupt(f(k, ctx))),
+            p));
 
-debuggable = function(p) {
-    return debug(p, atum_debuggable.Debuggable.create);
-};
+debuggable = \p ->
+    debug(p, atum_debuggable.Debuggable.create);
 
-debuggableStatement = function(p) {
-    return debug(p, atum_debuggable.StatementDebuggable.create);
-};
+debuggableStatement = \p ->
+    debug(p, atum_debuggable.StatementDebuggable.create);
 
-debuggableCall = function(p) {
-    return debug(
-        compute.bind(p, function(x) {
-            return debug(compute.just(x), function(ctx, k) {
-                return new atum_debuggable.PostCallDebuggable(ctx, k);
-            });
-        }),
-        function(ctx, k) {
-            return new atum_debuggable.PreCallDebuggable(ctx, k);
-        });
-};
+debuggableCall = \p -> 
+    debug(
+        bind(p, \x -> 
+            debug(just(x), atum_debuggable.PostCallDebuggable.create)),
+        atum_debuggable.PreCallDebuggable.create);
 
 }

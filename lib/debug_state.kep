@@ -8,7 +8,9 @@ package (
     
     inject)
 with
-    import 'amulet/record' record
+    import 'amulet/record' record,
+    
+    import 'sheut/semantics/debug/debuggable' {CompleteDebuggable}
 in {
 
 /* DebugState
@@ -33,7 +35,7 @@ DebugState = record.declare(null, [
         this.dgr = dgr;
         this.k = k;
         this.ctx = ctx;
-        this.complete = complete;
+        this.complete = complete || dgr instanceof CompleteDebuggable;
         this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
     });
 

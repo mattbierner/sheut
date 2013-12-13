@@ -4,6 +4,7 @@
 package (
     Debuggable,
     
+    CompleteDebuggable,
     StatementDebuggable,
     ExpressionDebuggable,
     DebuggerDebuggable,
@@ -19,6 +20,9 @@ Debuggable = record.declare(null, [
     'k',
     'ctx']);
 Debuggable.type = 'Debuggable';
+
+CompleteDebuggable = record.extend(Debuggable, []);
+CompleteDebuggable.type = 'Complete';
 
 StatementDebuggable = record.extend(Debuggable, []);
 StatementDebuggable.type = 'Statement';
