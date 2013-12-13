@@ -1,0 +1,50 @@
+/**
+ * @fileOverview
+ */
+package (
+    debug,
+    
+    debuggable,
+    debuggableStatement,
+    debuggableCall)
+with
+    import 'atum/compute' compute,
+    import 'sheut/semantics/debug/debuggable' atum_debuggable
+in {
+
+/* 
+ ******************************************************************************/
+/**
+ * 
+ */
+debug = function(p, f) {
+    return compute.bind(
+        compute.computeContext,
+        function(ctx) {
+            return compute.next(compute.callcc(function(k) {
+                return compute.abrupt(f(k, ctx));
+            }), p);
+        });
+};
+
+debuggable = function(p) {
+    return debug(p, atum_debuggable.Debuggable.create);
+};
+
+debuggableStatement = function(p) {
+    return debug(p, atum_debuggable.StatementDebuggable.create);
+};
+
+debuggableCall = function(p) {
+    return debug(
+        compute.bind(p, function(x) {
+            return debug(compute.just(x), function(ctx, k) {
+                return new atum_debuggable.PostCallDebuggable(ctx, k);
+            });
+        }),
+        function(ctx, k) {
+            return new atum_debuggable.PreCallDebuggable(ctx, k);
+        });
+};
+
+}

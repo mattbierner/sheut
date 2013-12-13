@@ -1,0 +1,38 @@
+/**
+ * @fileOverview Record for a debuggable state.
+ */
+package (
+    Debuggable,
+    
+    StatementDebuggable,
+    ExpressionDebuggable,
+    DebuggerDebuggable,
+    PreCallDebuggable,
+    PostCallDebuggable)
+with
+    import 'amulet/record' record
+in {
+
+/* Debuggable
+ ******************************************************************************/
+Debuggable = record.declare(null, [
+    'k',
+    'ctx']);
+Debuggable.type = 'Debuggable';
+
+StatementDebuggable = record.extend(Debuggable, []);
+StatementDebuggable.type = 'Statement';
+
+ExpressionDebuggable = record.extend(Debuggable, []);
+ExpressionDebuggable.type = 'Expression';
+
+DebuggerDebuggable = record.extend(Debuggable, []);
+DebuggerDebuggable.type = 'Debugger';
+
+PreCallDebuggable = record.extend(Debuggable, []);
+PreCallDebuggable.type = 'PreCall';
+
+PostCallDebuggable = record.extend(Debuggable, []);
+PostCallDebuggable.type = 'PostCall';
+
+}
