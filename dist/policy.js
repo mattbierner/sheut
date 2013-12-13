@@ -5,8 +5,8 @@
 define(["require", "exports", "sheut/interpreter/debuggable", "sheut/fun", "sheut/run", "sheut/operations/context"], (
     function(require, exports, debuggable, __o, __o0, context) {
         "use strict";
-        var always, never, notComplete, not, and, or, all, any, breakpoint, depthGt, depthGte, depthEq, debuggerDgr,
-                statementDgr, line, sameLine;
+        var test, always, never, notComplete, not, and, or, all, any, breakpoint, depthGt, depthGte, depthEq,
+                debuggerDgr, statementDgr, line, sameLine;
         var debuggable = debuggable,
             __o = __o,
             foldl = __o["foldl"],
@@ -21,6 +21,11 @@ define(["require", "exports", "sheut/interpreter/debuggable", "sheut/fun", "sheu
         var containsLine = (function(location, line) {
             return ((location.start.line <= line) && (line <= location.end.line));
         });
+        (test = (function(pred) {
+            return (function(current, next, previous) {
+                return (pred(current, next, previous) ? next : null);
+            });
+        }));
         (always = (function(_, next, _0) {
             return next;
         }));
@@ -118,6 +123,7 @@ define(["require", "exports", "sheut/interpreter/debuggable", "sheut/fun", "sheu
                 }));
             }));
         }));
+        (exports.test = test);
         (exports.always = always);
         (exports.never = never);
         (exports.notComplete = notComplete);

@@ -4,7 +4,7 @@
 */
 define(["require", "exports", "amulet/record", "sheut/interpreter/debuggable"], (function(require, exports, record, __o) {
     "use strict";
-    var DebugState, isComplete, inject;
+    var DebugState, createForDgr, isComplete, inject;
     var record = record,
         __o = __o,
         CompleteDebuggable = __o["CompleteDebuggable"];
@@ -16,6 +16,12 @@ define(["require", "exports", "amulet/record", "sheut/interpreter/debuggable"], 
         (this.complete = (complete || (dgr instanceof CompleteDebuggable)));
         (this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0));
     })));
+    (createForDgr = (function(dgr) {
+        var dgr = dgr,
+            k = dgr["k"],
+            ctx = dgr["ctx"];
+        return DebugState.create(dgr, k, ctx, (dgr instanceof CompleteDebuggable));
+    }));
     (isComplete = (function(dgr) {
         return (dgr && dgr.complete);
     }));
@@ -23,6 +29,7 @@ define(["require", "exports", "amulet/record", "sheut/interpreter/debuggable"], 
         return source.setCtx(source.ctx.setValues(result.ctx.values));
     }));
     (exports.DebugState = DebugState);
+    (exports.createForDgr = createForDgr);
     (exports.isComplete = isComplete);
     (exports.inject = inject);
 }))

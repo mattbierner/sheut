@@ -12,7 +12,7 @@ define(["require", "exports", "atum/compute/tail", "sheut/interpreter/debuggable
         __o0 = __o0,
         Debuggable = __o0["Debuggable"],
         __o1 = __o1,
-        DebugState = __o1["DebugState"],
+        createForDgr = __o1["createForDgr"],
         isComplete = __o1["isComplete"],
         __o2 = __o2,
         foldl = __o2["foldl"],
@@ -27,20 +27,15 @@ define(["require", "exports", "atum/compute/tail", "sheut/interpreter/debuggable
         sameLine = policy["sameLine"];
     var abrupt = policy.any(policy.debuggerDgr, policy.breakpoint);
     var nextContext = (function(s) {
-        return (isComplete(s) ? s : (function() {
-                {
-                    var c = trampoline(s.k(null, s.ctx));
-                    return DebugState.create(c, c.k, c.ctx, false);
-                }
-            })
-            .call(this));
+        return (isComplete(s) ? s : createForDgr(trampoline(s.k(null, s.ctx))));
     });
     (next = (function(d) {
         return d.setDebug(nextContext(d.debug));
     }));
     (nextWhile = (function(policy, d) {
-        var n = d;
-        var c, previous;
+        var n = d,
+            c = n;
+        var previous;
         do {
             (previous = c);
             (c = next(n));

@@ -3,6 +3,7 @@
  */
 package (
     DebugState,
+    createForDgr,
     
     isComplete,
     
@@ -39,12 +40,13 @@ DebugState = record.declare(null, [
         this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0);
     });
 
+createForDgr = \dgr{k, ctx} -> 
+    DebugState.create(dgr, k, ctx, dgr instanceof CompleteDebuggable);
+
 isComplete = \dgr ->
     (dgr && dgr.complete);
 
 inject = \source, result ->
     source.setCtx(source.ctx.setValues(result.ctx.values));
 
-    
-    
 }

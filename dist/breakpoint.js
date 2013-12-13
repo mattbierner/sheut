@@ -22,6 +22,7 @@ define(["require", "exports", "amulet/record", "atum/compute", "atum/compute/pro
         and = __o3["and"],
         statementDgr = __o3["statementDgr"],
         line = __o3["line"],
+        test = __o3["test"],
         context = context;
     var containsLine = (function(location, line) {
         return ((location.start.line <= line) && (line <= location.end.line));
@@ -32,23 +33,24 @@ define(["require", "exports", "amulet/record", "atum/compute", "atum/compute/pro
     (Breakpoint = record.declare(null, ["test", "ud"]));
     (create = Breakpoint.create);
     (unconditional = (function(line) {
-        return and(statementDgr, (function(current, next, previous) {
+        return and(statementDgr, test((function(current, next, previous) {
             return extract(previous, context.location, false, (function(currentLocation) {
-                return extract(next, context.location, false, (function(nextLocation) {
+                return extract(next, context.location, false, (function(
+                    nextLocation) {
                     return (((!currentLocation || !hasLine(currentLocation,
                         line)) && nextLocation) && hasLine(nextLocation,
                         line));
                 }));
             }));
-        }));
+        })));
     }));
     (conditional = (function(prog) {
         return (function() {
             {
                 var condition = bind(prog, isTrue);
-                return (function(_, next) {
+                return test((function(_, next) {
                     return extract(next, condition, false);
-                });
+                }));
             }
         })
             .call(this);

@@ -2,6 +2,7 @@
  * @fileOverview Operations for stepping through programs.
  */
 package (
+    test,
     always,
     never,
     notComplete,
@@ -36,9 +37,12 @@ in {
 var containsLine = \location, line ->
     (location.start.line <= line && line <= location.end.line);
 
-
-/* Basic Policies
+/* Test Policies
  ******************************************************************************/
+test = \pred -> 
+    \current, next, previous ->
+        pred(current, next, previous) ? next : null;
+
 always =  \_, next, _ -> next;
 
 never = \_, _, _ -> null;

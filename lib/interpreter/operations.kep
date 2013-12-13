@@ -9,7 +9,7 @@ package (
     debuggableCall)
 with
     import 'atum/compute' {abrupt, bind, callcc, computeContext, just, next},
-    import 'sheut/interpreter/debug/debuggable' atum_debuggable
+    import 'sheut/interpreter/debuggable' atum_debuggable
 in {
 
 debug = \p, f ->

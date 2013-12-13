@@ -22,7 +22,7 @@ with
     import 'atum/compute/tail' {trampoline},
     import 'sheut/interpreter/debuggable' {Debuggable},
     
-    import 'sheut/debug_state' {DebugState, isComplete},
+    import 'sheut/debug_state' {createForDgr, isComplete},
     import 'sheut/fun' {foldl, args},
     import 'sheut/policy' policy {notComplete, not, and, all, or, any, sameLine}
 in {
@@ -36,9 +36,9 @@ var abrupt = policy.any(
 /* Basic Operations
  ******************************************************************************/
 var nextContext = \s ->
-    (isComplete(s) ? s :
-        let c = trampoline(s.k(null, s.ctx)) in
-            DebugState.create(c, c.k, c.ctx, false));
+    (isComplete(s) ?
+        s :
+        createForDgr(trampoline(s.k(null, s.ctx))));
 
 /**
  * Perform a single step to the next debuggable in the program.
@@ -55,8 +55,8 @@ next = \d ->
  * @param d Debugger.
  */
 nextWhile = \policy, d -> {
-    var n = d;
-    var c, previous;
+    var n = d, c = n;
+    var previous;
     do {
         previous = c;
         c = next(n);

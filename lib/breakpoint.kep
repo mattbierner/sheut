@@ -15,7 +15,7 @@ with
     import 'atum/operations/boolean' {isTrue},
     import 'sheut/fun' {args, foldl},
     import 'sheut/run' {extract},
-    import 'sheut/policy' {and, statementDgr, line},
+    import 'sheut/policy' {and, statementDgr, line, test},
     import 'sheut/operations/context' context
 in {
 
@@ -52,7 +52,7 @@ create = Breakpoint.create;
 unconditional = \line ->
     and(
         statementDgr,
-        \current, next, previous ->
+        test <|\current, next, previous ->
             extract(previous, context.location, false,
                 \currentLocation ->
                     extract(next, context.location, false,
@@ -67,6 +67,7 @@ unconditional = \line ->
 conditional = \prog -> let
     condition = bind(prog, isTrue)
 in
-    \_, next -> extract(next, condition, false);
+    test <|\_, next ->
+        extract(next, condition, false);
 
 }

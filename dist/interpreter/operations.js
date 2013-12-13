@@ -2,7 +2,7 @@
  * THIS FILE IS AUTO GENERATED from 'lib/interpreter/operations.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "atum/compute", "sheut/interpreter/debug/debuggable"], (function(require, exports, __o,
+define(["require", "exports", "atum/compute", "sheut/interpreter/debuggable"], (function(require, exports, __o,
     atum_debuggable) {
     "use strict";
     var debug, debuggable, debuggableStatement, debuggableCall;
