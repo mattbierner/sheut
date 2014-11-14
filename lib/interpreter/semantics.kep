@@ -132,9 +132,7 @@ var decls = \node -> {
 /* Statements
  ******************************************************************************/
 var debuggableStatement = \f ->
-    fun.compose(
-        debug.debuggableStatement,
-        f);
+    f \>> debug.debuggableStatement;
 
 var emptyStatement = debug.debuggableStatement(
     semantics.emptyStatement);
@@ -229,9 +227,7 @@ program = program_semantics.program;
 
 programBody = program_semantics.programBody;
 
-program = fun.compose(
-    program_semantics.program,
-    sourceElements);
+program = program_semantics.program \>> sourceElements;
 
 var variableDeclarator = semantics.variableDeclarator;
 

@@ -2,12 +2,14 @@
  * @fileOverview
  */
 package (
-    evaluateAst,
+    evaluateAst
     evaluateInput)
 with
-    import 'ecma/parse/parser' {parse},
-    import 'atum/operations/evaluation' {evaluateText},
-    import 'atum/semantics/semantics' {programBody, sourceElements}
+    import 'ecma::parse::parser' {parse},
+    import 'atum::operations::evaluation' {evaluateText},
+    import 'atum::semantics::semantics' {
+        programBody
+        sourceElements}
 in {
 
 /* Evaluation Operations

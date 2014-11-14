@@ -1,5 +1,5 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/debug.kep'
+ * THIS FILE IS AUTO GENERATED FROM 'lib/debug.kep'
  * DO NOT EDIT
 */
 define(["require", "exports", "atum/compute", "atum/compute/context", "atum/compute/statement", "atum/compute/program",
@@ -10,52 +10,36 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
     semantics, __o2, __o3, __o4) {
     "use strict";
     var initialize, debug, debugInitial, beginInitial, begin, beginInitialProgram, beginProgram,
-            beginInitialInput, beginInput;
-    var compute = compute,
-        sequence = compute["sequence"],
+            beginInitialInput, beginInput, sequence = compute["sequence"],
         computeContext = compute["computeContext"],
-        __o = __o,
         ComputeContext = __o["ComputeContext"],
-        statement = statement,
-        program = program,
-        interpret = interpret,
-        __o0 = __o0,
         evaluateText = __o0["evaluateText"],
-        global = global,
-        globalOps = globalOps,
-        __o1 = __o1,
-        parse = __o1["parse"],
-        semantics = semantics,
-        __o2 = __o2,
         CompleteDebuggable = __o2["CompleteDebuggable"],
-        __o3 = __o3,
         DebugState = __o3["DebugState"],
-        __o4 = __o4,
-        Debugger = __o4["Debugger"];
-    var memo = (function(f) {
-        var val;
-        return (function() {
-            var args = arguments;
-            if ((val !== undefined)) return val;
-            (val = f.apply(null, args));
-            return val;
+        Debugger = __o4["Debugger"],
+        memo = (function(f) {
+            var val;
+            return (function() {
+                var args = arguments;
+                if ((val !== undefined)) return val;
+                (val = f.apply(null, args));
+                return val;
+            });
+        }),
+        ret = (function(x) {
+            return x;
+        }),
+        thr = (function(x) {
+            throw x;
+        }),
+        execute = (function(d, p, ctx, ok, err) {
+            return d.setDebug(DebugState.create(null, (function() {
+                return interpret.exec(p, ctx, ok, err);
+            }), ctx, false));
+        }),
+        globalContext, sm = ({
+            "sourceElements": semantics.sourceElements
         });
-    });
-    var ret = (function(x) {
-        return x;
-    });
-    var thr = (function(x) {
-        throw x;
-    });
-    var execute = (function(d, p, ctx, ok, err) {
-        return d.setDebug(DebugState.create(null, (function() {
-            return interpret.exec(p, ctx, ok, err);
-        }), ctx, false));
-    });
-    var globalContext;
-    var sm = ({
-        "sourceElements": semantics.sourceElements
-    });
     (initialize = memo((function(custom) {
         return interpret.exec(sequence(global.initialize(), globalOps.enterGlobal(), compute.modifyContext(
             (function(ctx) {
@@ -66,24 +50,19 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
         }), thr);
     })));
     var getGlobalContext = (function() {
-        if (!globalContext) return initialize();
+        if ((!globalContext)) return initialize();
         return globalContext;
     });
     (debug = (function(d, p, ctx, ok, err) {
-        return (function() {
-            {
-                var suc = (ok || ret),
-                    fail = (err || thr),
-                    pok = (function(x, ctx) {
-                        return CompleteDebuggable.create(suc(x, ctx), ctx);
-                    }),
-                    perr = (function(x, ctx) {
-                        return CompleteDebuggable.create(fail(x, ctx), ctx);
-                    });
-                return execute(d, p, ctx, pok, perr);
-            }
-        })
-            .call(this);
+        var suc = (ok || ret),
+            fail = (err || thr),
+            pok = (function(x, ctx0) {
+                return CompleteDebuggable.create(suc(x, ctx0), ctx0);
+            }),
+            perr = (function(x, ctx0) {
+                return CompleteDebuggable.create(fail(x, ctx0), ctx0);
+            });
+        return execute(d, p, ctx, pok, perr);
     }));
     (debugInitial = (function(p, ctx, ok, err) {
         return debug(Debugger.initial, p, ctx, ok, err);
@@ -95,8 +74,7 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
         return debug(Debugger.initial, p, getGlobalContext(), ok, err);
     }));
     (beginProgram = (function(d, __o5, ok, err) {
-        var __o5 = __o5,
-            body = __o5["body"];
+        var body = __o5["body"];
         return begin(d, semantics.programBody(semantics.sourceElements(body)), ok, err);
     }));
     (beginInitialProgram = (function(prog, ok, err) {
@@ -108,13 +86,13 @@ define(["require", "exports", "atum/compute", "atum/compute/context", "atum/comp
     (beginInitialInput = (function(text, ok, err) {
         return beginInput(Debugger.initial, text, ok, err);
     }));
-    (exports.initialize = initialize);
-    (exports.debug = debug);
-    (exports.debugInitial = debugInitial);
-    (exports.beginInitial = beginInitial);
-    (exports.begin = begin);
-    (exports.beginInitialProgram = beginInitialProgram);
-    (exports.beginProgram = beginProgram);
-    (exports.beginInitialInput = beginInitialInput);
-    (exports.beginInput = beginInput);
-}))
+    (exports["initialize"] = initialize);
+    (exports["debug"] = debug);
+    (exports["debugInitial"] = debugInitial);
+    (exports["beginInitial"] = beginInitial);
+    (exports["begin"] = begin);
+    (exports["beginInitialProgram"] = beginInitialProgram);
+    (exports["beginProgram"] = beginProgram);
+    (exports["beginInitialInput"] = beginInitialInput);
+    (exports["beginInput"] = beginInput);
+}));

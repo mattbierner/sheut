@@ -9,15 +9,16 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
 ], (function(require, exports, compute, statement, execution_context, declaration_semantics, expression_semantics,
     function_semantics, program_semantics, semantics, value_semantics, atum_debuggable, debug, fun) {
     "use strict";
-    var sourceElements, declarations, program, programBody, mapSemantics, f, f0, f1, f2, f3, f4, f5, f6, f7, f8,
-            f9, f10, f11, f12, x, y, isStrict = (function(elems) {
-                if (((elems && elems.length) && (elems[0].type === "ExpressionStatement"))) {
-                    var first = elems[0].expression;
-                    return (((first && (first.type === "Literal")) && (first.kind === "string")) && (first.value ===
-                        "use strict"));
-                }
-                return false;
-            }),
+    var sourceElements, declarations, program, programBody, mapSemantics, f, y, f0, y0, f1, y1, f2, y2, f3, y3,
+            f4, y4, f5, y5, f6, y6, f7, y7, f8, y8, f9, y9, f10, y10, f11, y11, f12, y12, x, y13, isStrict = (
+                function(elems) {
+                    if (((elems && elems.length) && (elems[0].type === "ExpressionStatement"))) {
+                        var first = elems[0].expression;
+                        return (((first && (first.type === "Literal")) && (first.kind === "string")) && (first.value ===
+                            "use strict"));
+                    }
+                    return false;
+                }),
         input = (function(loc, body) {
             return compute.next(execution_context.setLoc(loc), body);
         });
@@ -85,23 +86,65 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
         blockStatement = (function(body) {
             return ((!body.length) ? emptyStatement : semantics.blockStatement(body));
         }),
-        expressionStatement = ((f = semantics.expressionStatement), fun.compose(debug.debuggableStatement, f)),
-        ifStatement = ((f0 = semantics.ifStatement), fun.compose(debug.debuggableStatement, f0)),
-        breakStatement = ((f1 = semantics.breakStatement), fun.compose(debug.debuggableStatement, f1)),
-        continueStatement = ((f2 = semantics.continueStatement), fun.compose(debug.debuggableStatement, f2)),
-        returnStatement = ((f3 = semantics.returnStatement), fun.compose(debug.debuggableStatement, f3)),
-        throwStatement = ((f4 = semantics.throwStatement), fun.compose(debug.debuggableStatement, f4)),
-        withStatement = ((f5 = semantics.withStatement), fun.compose(debug.debuggableStatement, f5)),
-        switchStatement = ((f6 = semantics.switchStatement), fun.compose(debug.debuggableStatement, f6)),
-        tryStatement = ((f7 = semantics.tryStatement), fun.compose(debug.debuggableStatement, f7)),
-        whileStatement = ((f8 = semantics.whileStatement), fun.compose(debug.debuggableStatement, f8)),
-        doWhileStatement = ((f9 = semantics.doWhileStatement), fun.compose(debug.debuggableStatement, f9)),
+        expressionStatement = ((f = semantics.expressionStatement), (y = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y(f.apply(null, args));
+        })),
+        ifStatement = ((f0 = semantics.ifStatement), (y0 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y0(f0.apply(null, args));
+        })),
+        breakStatement = ((f1 = semantics.breakStatement), (y1 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y1(f1.apply(null, args));
+        })),
+        continueStatement = ((f2 = semantics.continueStatement), (y2 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y2(f2.apply(null, args));
+        })),
+        returnStatement = ((f3 = semantics.returnStatement), (y3 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y3(f3.apply(null, args));
+        })),
+        throwStatement = ((f4 = semantics.throwStatement), (y4 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y4(f4.apply(null, args));
+        })),
+        withStatement = ((f5 = semantics.withStatement), (y5 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y5(f5.apply(null, args));
+        })),
+        switchStatement = ((f6 = semantics.switchStatement), (y6 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y6(f6.apply(null, args));
+        })),
+        tryStatement = ((f7 = semantics.tryStatement), (y7 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y7(f7.apply(null, args));
+        })),
+        whileStatement = ((f8 = semantics.whileStatement), (y8 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y8(f8.apply(null, args));
+        })),
+        doWhileStatement = ((f9 = semantics.doWhileStatement), (y9 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y9(f9.apply(null, args));
+        })),
         forStatement = ((f10 = (function(init, test, update, body) {
             return semantics.forStatement(debug.debuggable(init), debug.debuggable(test), debug.debuggable(
                 update), body);
-        })), fun.compose(debug.debuggableStatement, f10)),
-        forInStatement = ((f11 = semantics.forInStatement), fun.compose(debug.debuggableStatement, f11)),
-        forVarInStatement = ((f12 = semantics.forVarInStatement), fun.compose(debug.debuggableStatement, f12)),
+        })), (y10 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y10(f10.apply(null, args));
+        })),
+        forInStatement = ((f11 = semantics.forInStatement), (y11 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y11(f11.apply(null, args));
+        })),
+        forVarInStatement = ((f12 = semantics.forVarInStatement), (y12 = debug.debuggableStatement), (function() {
+            var args = arguments;
+            return y12(f12.apply(null, args));
+        })),
         thisExpression = semantics.thisExpression,
         sequenceExpression = semantics.sequenceExpression,
         unaryExpression = semantics.unaryExpression,
@@ -111,9 +154,9 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
         assignmentExpression = semantics.assignmentExpression,
         conditionalExpression = semantics.conditionalExpression,
         newExpression = semantics.newExpression,
-        callExpression = ((x = debug.debuggableCall), (y = semantics.callExpression), (function() {
+        callExpression = ((x = debug.debuggableCall), (y13 = semantics.callExpression), (function() {
             var args = arguments;
-            return x(y.apply(null, args));
+            return x(y13.apply(null, args));
         })),
         memberExpression = semantics.memberExpression,
         computedMemberExpression = semantics.computedMemberExpression,
@@ -125,7 +168,12 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
     }));
     (program = program_semantics.program);
     (programBody = program_semantics.programBody);
-    (program = fun.compose(program_semantics.program, sourceElements));
+    var x0 = program_semantics.program,
+        y14 = sourceElements;
+    (program = (function() {
+        var args = arguments;
+        return y14(x0.apply(null, args));
+    }));
     var variableDeclarator = semantics.variableDeclarator,
         identifier = semantics.identifier,
         literal = semantics.literal;

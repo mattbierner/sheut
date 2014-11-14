@@ -2,41 +2,41 @@
  * @fileOverview Beginning and running a debug session
  */
 package (
-    initialize,
+    initialize
     
-    debug,
-    debugInitial,
+    debug
+    debugInitial
     
-    beginInitial,
-    begin,
+    beginInitial
+    begin
     
-    beginInitialProgram,
-    beginProgram,
+    beginInitialProgram
+    beginProgram
     
-    beginInitialInput,
+    beginInitialInput
     beginInput)
 with
-    import 'atum/compute' compute{sequence, computeContext},
-    import 'atum/compute/context' {ComputeContext},
-    import 'atum/compute/statement' statement,
-    import 'atum/compute/program' program,
-    import 'atum/interpret' interpret,
-    import 'atum/operations/evaluation' {evaluateText},
-    import 'atum/builtin/impl/global' global,
-    import 'atum/builtin/operations/global' globalOps,
+    import 'atum::compute' compute#{sequence, computeContext},
+    import 'atum::compute::context' {ComputeContext},
+    import 'atum::compute::statement' statement,
+    import 'atum::compute::program' program,
+    import 'atum::interpret' interpret,
+    import 'atum::operations::evaluation' {evaluateText},
+    import 'atum::builtin::impl::global' global,
+    import 'atum::builtin::operations::global' globalOps,
     
-    import 'ecma/parse/parser' {parse},
+    import 'ecma::parse::parser' {parse},
     
-    import 'sheut/interpreter/semantics' semantics,
-    import 'sheut/interpreter/debuggable' {CompleteDebuggable},
+    import 'sheut::interpreter::semantics' semantics,
+    import 'sheut::interpreter::debuggable' {CompleteDebuggable},
 
-    import 'sheut/debug_state' {DebugState},
-    import 'sheut/state' {Debugger}
+    import 'sheut::debug_state' {DebugState},
+    import 'sheut::state' {Debugger}
 in {
 
 var memo = \f -> {
     var val;
-    return \args(...) -> {
+    return \-args(...) -> {
         if (val !== undefined)
             return val;
         val = f.apply(null, args);
@@ -79,7 +79,7 @@ var sm = {
 /**
  * 
  */
-initialize = memo <| \custom ->
+initialize = memo \ custom ->
     interpret.exec(
         sequence(
             global.initialize(),
@@ -110,12 +110,12 @@ var getGlobalContext = \-> {
  * 
  * @return Debugger object.
  */
-debug = \d, p, ctx, ok, err -> let
+debug = \d p ctx ok err -> let
     suc = (ok || ret),
     fail = (err || thr),
-    pok = \x, ctx ->
+    pok = \x ctx ->
         CompleteDebuggable.create(suc(x, ctx), ctx),
-    perr = \x, ctx ->
+    perr = \x ctx ->
         CompleteDebuggable.create(fail(x, ctx), ctx)
 in
     execute(
@@ -130,7 +130,7 @@ in
  * 
  * @see debug
  */
-debugInitial = \p, ctx, ok, err ->
+debugInitial = \p ctx ok err ->
     debug(
         Debugger.initial,
         p,
@@ -146,7 +146,7 @@ debugInitial = \p, ctx, ok, err ->
  * 
  * @see debug
  */
-begin = \d, p, ok, err ->
+begin = \d p ok err ->
     debug(
         d,
         p,
@@ -161,7 +161,7 @@ begin = \d, p, ok, err ->
  * 
  * @see debug
  */
-beginInitial = \p, ok, err ->
+beginInitial = \p ok err ->
     debug(
         Debugger.initial,
         p,
@@ -176,7 +176,7 @@ beginInitial = \p, ok, err ->
  * 
  * @see begin
  */
-beginProgram = \d, {body}, ok, err ->
+beginProgram = \d {body} ok err ->
     begin(
         d,
         semantics.programBody(
@@ -191,7 +191,7 @@ beginProgram = \d, {body}, ok, err ->
  * 
  * @see begin
  */
-beginInitialProgram = \prog, ok, err ->
+beginInitialProgram = \prog ok err ->
     beginProgram(
         Debugger.initial,
         prog,
@@ -208,7 +208,7 @@ beginInitialProgram = \prog, ok, err ->
  * 
  * @see begin
  */
-beginInput = \d, text, ok, err ->
+beginInput = \d text ok err ->
     begin(
         d,
         evaluateText(text),
@@ -220,7 +220,7 @@ beginInput = \d, text, ok, err ->
  * 
  * @see beginInput
  */
-beginInitialInput = \text, ok, err ->
+beginInitialInput = \text ok err ->
     beginInput(
         Debugger.initial,
         text,

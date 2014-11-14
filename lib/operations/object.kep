@@ -2,24 +2,27 @@
  * @fileOverview
  */
 package (
-    getOwnPropertyNames,
-    getOwnProperties,
-    getPrototype,
-    get,
+    getOwnPropertyNames
+    getOwnProperties
+    getPrototype
+    get
     
     displayName)
 with
-    import 'atum/compute' {bind, just, enumerationa},
-    import 'atum/builtin/object' {ObjectPrototypeToString},
-    import 'atum/operations/error' {typeError},
-    import 'atum/operations/func' {functionApply},
-    import 'atum/operations/object' object,
-    import 'atum/operations/value_reference' value_reference,
-    import 'atum/value/value' {isObject},
-    import 'atum/value/type' type,
+    import 'atum::compute' {
+        bind
+        just
+        enumerationa},
+    import 'atum::builtin::object' {ObjectPrototypeToString},
+    import 'atum::operations::error' {typeError},
+    import 'atum::operations::func' {functionApply},
+    import 'atum::operations::object' object,
+    import 'atum::operations::value_reference' value_reference,
+    import 'atum::value::value' {isObject},
+    import 'atum::value::type' type,
 
-    import 'sheut/fun' {foldl, map},
-    import 'sheut/operations/reference' {getFrom, getValue}
+    import 'sheut::fun' {foldl map},
+    import 'sheut::operations::reference' {getFrom getValue}
 in {
 
 /**
@@ -39,11 +42,11 @@ getOwnProperties = \obj ->
         getOwnPropertyNames(obj),
         \names ->
             bind(
-                map((get, obj), names) |> enumerationa,
+                map(get@obj, names) |> enumerationa,
                 \values ->
                     just(foldl(
                         \p, name, i -> {
-                            p[name] = values[i];
+                            p.(name) = values.(i);
                             return p;
                         },
                         {},
@@ -53,10 +56,10 @@ getOwnProperties = \obj ->
  * Get the prototype of an object.
  */
 getPrototype = \obj ->
-    value_reference.dereference(obj, \t ->
-        (isObject(t) ?
-            just(t.proto) :
-            typeError()));
+    value_reference.dereference @ obj \ t ->
+        ?isObject t
+            :just t.proto
+            :typeError();
 
 /**
  * Get the value of a property on an object.

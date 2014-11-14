@@ -2,46 +2,32 @@
  * @fileOverview 
  */
 package (
-    identity,
-    args,
-    constant,
+    identity
+    args
+    constant
     
-    compose,
-    call,
-    apply,
-    flip,
-    
-    curry,
-    
-    concat,
-    map,
-    foldl,
-    foldr,
+    flip
+
+    concat
+    map
+    foldl
+    foldr
     slice)
 {
 
 identity = \x -> x;
 
-args = \args(...) -> args;
+args = \-args(...) -> args;
 
-constant = \x -> \() -> x;
+constant = \x -> \ -> x;
 
-compose = \f, g -> 
-    \args(...) ->
-        f(g.apply(undefined, args));
-
-call = \args(f, ...) ->
-    Function.prototype.call.apply(f, args);
-
-apply = \f, args ->
-    Function.prototype.apply.apply(f, args);
 
 flip = \f ->
     \x, y -> f(y, x);
 
 /* 
  ******************************************************************************/
-concat = \args(...) ->
+concat = \-args(...) ->
     Array.prototype.concat.apply([], args);
 
 map = \f, a ->
@@ -55,10 +41,5 @@ foldr = \f, z, a ->
 
 slice = \start, end, a ->
     Array.prototype.slice.call(a, start, end);
-
-/* 
- ******************************************************************************/
-curry = \args(f, ...) ->
-    f.bind.apply(f, args);
 
 }
