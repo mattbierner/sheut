@@ -9,22 +9,25 @@ package (
     unconditional,
     conditional)
 with
-    import 'amulet/record' record,
-    import 'atum/compute' {bind},
-    import 'atum/compute/program' program,
-    import 'atum/operations/boolean' {isTrue},
-    import 'sheut/fun' {args, foldl},
-    import 'sheut/run' {extract},
-    import 'sheut/policy' {and, statementDgr, line, test},
-    import 'sheut/operations/context' context
+    import 'bes::record' record,
+    import 'atum::compute' {bind},
+    import 'atum::compute::program' program,
+    import 'atum::operations::boolean' {isTrue},
+    
+    import 'sheut::fun' {args, foldl},
+    import 'sheut::run' {extract},
+    import 'sheut::policy' {and, statementDgr, line, test},
+    import 'sheut::state' {setBreakpoint},
+
+    import 'sheut::operations::context' context
 in {
 
 /* Location Operations
  ******************************************************************************/
-var containsLine = \location, line ->
+var containsLine = \location line ->
     (location.start.line <= line && line <= location.end.line);
 
-var hasLine = \location, line ->
+var hasLine = \location line ->
     (location.start.line === line);
 
 /* Breakpoint
@@ -38,7 +41,16 @@ var hasLine = \location, line ->
  */
 Breakpoint = record.declare(null, [
     'test',
-    'ud']);
+    'ud',
+    'update']);
+
+Breakpoint.prototype.policy = \id =self->
+    \current next previous -> {
+        var r = self.test(current, next, previous);
+        return ?r
+            :setBreakpoint(next, id)
+            :r;
+    };
 
 create = Breakpoint.create;
 
@@ -52,7 +64,7 @@ create = Breakpoint.create;
 unconditional = \line ->
     and(
         statementDgr,
-        test <|\current, next, previous ->
+        test \ current next previous ->
             extract(previous, context.location, false,
                 \currentLocation ->
                     extract(next, context.location, false,
@@ -69,7 +81,7 @@ conditional = \prog -> let
 in
     and(
         statementDgr,
-        test <|\_, next ->
+        test \ _ next ->
             extract(next, condition, false));
 
 }

@@ -2,16 +2,16 @@
  * @fileOverview Record for a debuggable state.
  */
 package (
-    Debuggable,
+    Debuggable
     
-    CompleteDebuggable,
-    StatementDebuggable,
-    ExpressionDebuggable,
-    DebuggerDebuggable,
-    PreCallDebuggable,
+    CompleteDebuggable
+    StatementDebuggable
+    ExpressionDebuggable
+    DebuggerDebuggable
+    PreCallDebuggable
     PostCallDebuggable)
 with
-    import 'amulet/record' record
+    import 'bes::record' record
 in {
 
 /* Debuggable
@@ -19,24 +19,25 @@ in {
 Debuggable = record.declare(null, [
     'k',
     'ctx']);
-Debuggable.type = 'Debuggable';
+
+Debuggable.type = Debuggable.prototype.type= 'Debuggable';
 
 CompleteDebuggable = record.extend(Debuggable, []);
-CompleteDebuggable.type = 'Complete';
+CompleteDebuggable.type = CompleteDebuggable.prototype.type = 'Complete';
 
 StatementDebuggable = record.extend(Debuggable, []);
-StatementDebuggable.type = 'Statement';
+StatementDebuggable.type = StatementDebuggable.prototype.type = 'Statement';
 
 ExpressionDebuggable = record.extend(Debuggable, []);
-ExpressionDebuggable.type = 'Expression';
+ExpressionDebuggable.type = ExpressionDebuggable.prototype.type = 'Expression';
 
 DebuggerDebuggable = record.extend(Debuggable, []);
-DebuggerDebuggable.type = 'Debugger';
+DebuggerDebuggable.type = DebuggerDebuggable.prototype.type = 'Debugger';
 
 PreCallDebuggable = record.extend(Debuggable, []);
-PreCallDebuggable.type = 'PreCall';
+PreCallDebuggable.type = PreCallDebuggable.prototype.type = 'PreCall';
 
 PostCallDebuggable = record.extend(Debuggable, []);
-PostCallDebuggable.type = 'PostCall';
+PostCallDebuggable.type = PostCallDebuggable.prototype.type = 'PostCall';
 
 }

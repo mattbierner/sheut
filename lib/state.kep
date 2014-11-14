@@ -1,28 +1,31 @@
 /**
- * @fileOverview
+ * @fileOverview Debugger State object and operations.
  */
 package (
-    Debugger,
+    Debugger
+
+    isComplete
+    getResult
     
-    isComplete,
-    getResult,
-    
-    addBreakpoint,
+    setBreakpoint
+    addBreakpoint
     removeBreakpoint)
 with
-    import 'amulet/record' record,
-    import 'amulet/object' {deleteProperty, setProperty},
-
-    import 'sheut/fun' {concat}
+    import 'bes::record' record,
+    import 'bes::object' {
+        deleteProperty
+        setProperty},
+    
+    import 'sheut::debug_state' debug_state
 in {
 
 /* Debugger
  ******************************************************************************/
 /**
- * State of debugger.
+ * Debugger State.
  * 
- * @param debug Debugger session state.
- * @param breakpoints Array of breakpoints.
+ * @param debug Debug session.
+ * @param breakpoints Map of ids to active breakpoints.
  */
 Debugger = record.declare(null, [
     'debug',
@@ -36,28 +39,37 @@ Debugger.initial = Debugger.create(null, {});
  * 
  */
 isComplete = \d ->
-    (d.debug && d.debug.complete);
+    (d.debug && debug_state.isComplete(d.debug));
 
 /**
  * 
  */
 getResult = \d ->
-    (d.debug && d.debug.complete ?
-        d.debug.k :
-        null);
+    ?d.debug && d.debug.complete
+        :d.debug.k
+        :null;
 
+/* Breakpoint Operations
+ ******************************************************************************/
 /**
- * Register a breakpoint.
+ * Set a breakpoint.
  * 
- * Overwrites any breakpoint alreay registered with the given id.
+ * Overwrites any breakpoint already registered with the given id.
  * 
  * @param d Debug state.
  * @param id Unique id for breakpoint.
  * @param breakpoint Breakpoint object.
  */
-addBreakpoint = \d, id, breakpoint ->
+setBreakpoint = \d id breakpoint ->
     d.setBreakpoints(
         setProperty(d.breakpoints, id, breakpoint, true));
+
+/**
+ * Register a breakpoint.
+ * 
+ * @see setBreakpoint
+ */
+addBreakpoint = setBreakpoint;
 
 /**
  * Unregister a breakpoint.
@@ -65,7 +77,7 @@ addBreakpoint = \d, id, breakpoint ->
  * @param d Debug state.
  * @param id Unique id for breakpoint.
  */
-removeBreakpoint = \d, id ->
+removeBreakpoint = \d id ->
     d.setBreakpoints(
         deleteProperty(d.breakpoints, id));
 

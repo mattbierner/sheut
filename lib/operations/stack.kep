@@ -2,22 +2,26 @@
  * @fileOverview
  */
 package (
-    stack,
+    stack
     getStackFrameName)
 with
-    import 'amulet/record' record,
+    import 'bes::record' record,
 
-    import 'atum/compute' compute {bind, binds, enumeration, just},
-    import 'atum/context/environment' {ObjectLexicalEnvironment},
-    import 'atum/semantics/expression' {logicalOr},
-    import 'atum/operations/environment' environment_ops{getEnvironment},
-    import 'atum/operations/execution_context' execution_context,
-    import 'atum/operations/internal_reference' internal_reference,
-    import 'atum/operations/object' object,
-    import 'atum/operations/string' string,
-    import 'sheut/operations/reference' {getFrom, getValue},
+    import 'atum::compute' compute#{
+        bind
+        binds
+        enumeration
+        just},
+    import 'atum::context::environment' {ObjectLexicalEnvironment},
+    import 'atum::semantics::expression' {logicalOr},
+    import 'atum::operations::environment' environment_ops#{getEnvironment},
+    import 'atum::operations::execution_context' execution_context,
+    import 'atum::operations::internal_reference' internal_reference,
+    import 'atum::operations::object' object,
+    import 'atum::operations::string' string,
+    import 'sheut::operations::reference' {getFrom, getValue},
     
-    import 'sheut/operations/context' context
+    import 'sheut::operations::context' context
 in {
 
 /**
@@ -30,7 +34,7 @@ in {
  * @member location The current location of the frame. For a function in the
  *  stack, this is the location where the next frame's function call was made.
  */
-var Frame = record.declare(null, [
+var Frame := record.declare(null, [
     'func',
     'environment',
     'location']);
@@ -45,7 +49,7 @@ var Frame = record.declare(null, [
  * Stack is an array with the top element first. Always contains a single global
  * frame.
  */
-stack = let
+stack := let
     _stack = execution_context.extract(\ctx ->
         ctx.metadata.stack)
 in
@@ -57,9 +61,9 @@ in
         \stack, loc, env -> {
             var out = [];
             var func = null;
-            stack.reverse().forEach <|\frame{environment, location} -> {
+            stack.reverse().forEach \ {environment location callee} -> {
                 out.unshift(Frame.create(func, environment, location));
-                func = frame.func;
+                func = callee;
             };
             out.unshift(Frame.create(func, env, loc));
             return just(out);
@@ -68,15 +72,16 @@ in
 /**
  * Get a display name for a stack frame.
  */
-getStackFrameName = let
-    anon = just('[Anonymous Function]'),
-    global = just('[global]')
+getStackFrameName := let
+    anon = just '[Anonymous Function]',
+    global = just '[global]'
 in
-    \frame{func} ->
-        (!func ? global : 
-            compute.branch(object.hasProperty(func, 'name'),
+    \frame#{func} ->
+        ?!func
+            :global
+            :compute.branch(object.hasProperty(func, 'name'),
                 bind(bind(object.get(func, 'name'), string.toHost), \name ->
-                    (name ? just(name) : anon)),
-                anon));
+                    ?name : just name : anon),
+                anon);
 
 }

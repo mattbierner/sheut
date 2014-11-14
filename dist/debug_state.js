@@ -1,35 +1,32 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/debug_state.kep'
+ * THIS FILE IS AUTO GENERATED FROM 'lib/debug_state.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "amulet/record", "sheut/interpreter/debuggable"], (function(require, exports, record, __o) {
+define(["require", "exports", "bes/record", "sheut/interpreter/debuggable"], (function(require, exports, record, __o) {
     "use strict";
-    var DebugState, createForDgr, isComplete, inject;
-    var record = record,
-        __o = __o,
-        CompleteDebuggable = __o["CompleteDebuggable"];
+    var DebugState, createForDgr, isComplete, inject, CompleteDebuggable = __o["CompleteDebuggable"];
     (DebugState = record.declare(null, ["dgr", "k", "ctx", "complete", "depth"], (function(dgr, k, ctx,
         complete, previousLocation) {
-        (this.dgr = dgr);
-        (this.k = k);
-        (this.ctx = ctx);
-        (this.complete = (complete || (dgr instanceof CompleteDebuggable)));
-        (this.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0));
+        var self = this;
+        (self.dgr = dgr);
+        (self.k = k);
+        (self.ctx = ctx);
+        (self.complete = (complete || (dgr instanceof CompleteDebuggable)));
+        (self.depth = (ctx.userData ? ctx.userData.metadata.stack.length : 0));
     })));
     (createForDgr = (function(dgr) {
-        var dgr = dgr,
-            k = dgr["k"],
+        var k = dgr["k"],
             ctx = dgr["ctx"];
         return DebugState.create(dgr, k, ctx, (dgr instanceof CompleteDebuggable));
     }));
-    (isComplete = (function(dgr) {
-        return (dgr && dgr.complete);
+    (isComplete = (function(y) {
+        return (y && y.complete);
     }));
     (inject = (function(source, result) {
         return source.setCtx(source.ctx.setValues(result.ctx.values));
     }));
-    (exports.DebugState = DebugState);
-    (exports.createForDgr = createForDgr);
-    (exports.isComplete = isComplete);
-    (exports.inject = inject);
-}))
+    (exports["DebugState"] = DebugState);
+    (exports["createForDgr"] = createForDgr);
+    (exports["isComplete"] = isComplete);
+    (exports["inject"] = inject);
+}));

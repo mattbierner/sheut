@@ -1,9 +1,11 @@
-define(['sheut/debug',
+define(['atum/compute',
+        'sheut/debug',
         'sheut/step',
         'sheut/run',
         'sheut/operations/context',
         'sheut/operations/evaluation'],
-function(debug,
+function(compute,
+        debug,
         step,
         run,
         context,
@@ -83,27 +85,42 @@ function(debug,
             }],
             ["Step goes into and out of functions",
             function(){
-                var d = debug.beginInitialInput("function f(){ var x = 3; return x * 2; }; var x = 0; debugger; x = f(); x = 5;");
+                var d = debug.beginInitialInput("function f(){\n var x = 3; \n return x * 2;\n };\n var x = 0; debugger; x = f(); x = 5;");
                 d = step.run(d);
+                
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("typeof x")).value,
                     'number');
+                
                 assert.equal(
                     run.extract(d, evaluate.evaluateInput("x")).value,
                     0);
+                
                 assert.equal(
                     run.extract(d, context.stack).length,
                     0);
-                    
+                
                 var d1 = step.sequence(step.step, step.step, step.step)(d);
+                
+                console.log(d1);
+                console.log(run.extract(d1, context.location) + '');
+                var a = run.extract(d1, compute.bind(context.environment, function(env) {
+                    return context.getEnvironmentBindings(env);
+                }));
+                console.log(a);
+
                 assert.equal(
                     run.extract(d1, evaluate.evaluateInput("x")).value,
                     3);
+                
                 assert.equal(
                     run.extract(d1, context.stack).length,
                     1);
                 
                 var d2 = step.step(d1);
+                console.log(d2);
+                console.log(run.extract(d2, context.location) + '');
+
                 assert.equal(
                     run.extract(d2, evaluate.evaluateInput("x")).value,
                     6);

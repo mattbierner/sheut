@@ -40,7 +40,7 @@ function(compute,
                     return context.getEnvironmentBinding(env, 'Infinity');
                 }));
                 assert.equal(inf.type, 'number');
-                assert.equal(inf.value, Infinity);
+                assert.deepEqual(inf.value, Infinity);
                 
                 // Lookup undefined binding
                 var none = run.extract(d1, compute.bind(context.environment, function(env) {

@@ -18,16 +18,18 @@ package (
     stack,
     getStackFrameName)
 with
-    import 'atum/compute' compute {bind, just},
+    import 'atum/compute' compute#{bind, just},
     import 'atum/context/environment' {ObjectLexicalEnvironment},
     import 'atum/semantics/expression' {logicalOr},
-    import 'atum/operations/environment' environment_ops{getEnvironment},
+    import 'atum/operations/environment' environment_ops#{getEnvironment},
     import 'atum/operations/execution_context' execution_context,
     import 'atum/operations/internal_reference' internal_reference,
     import 'atum/operations/object' object,
     import 'atum/operations/string' string,
     import 'sheut/operations/reference' {getFrom, getValue},
-    import 'atum/operations/type_conversion' {toString}
+    import 'atum/operations/type_conversion' {toString},
+    
+    import 'hamt' hamt
 in {
 
 /* Program Context
@@ -48,10 +50,10 @@ environment = getFrom(getEnvironment);
  * Get a mapping for the bindings for an environment.
  */
 getEnvironmentBindings = \env ->
-    bind(getValue(env), \env{record} ->
-        (env instanceof ObjectLexicalEnvironment ?
-            compute.bind(getValue(record), \obj -> just(Object.keys(obj.properties))) :
-            just(Object.keys(record))));
+    bind(getValue(env), \env#{record} ->
+        ?env instanceof ObjectLexicalEnvironment
+            :compute.bind(getValue(record), \obj -> just(hamt.pairs(obj.properties)))
+            :just(hamt.pairs(record)));
 
 /**
  * Get a mapping for the bindings for an environment.

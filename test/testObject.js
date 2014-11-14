@@ -20,7 +20,7 @@ function(compute,
     return {
         'module': "Object",
         'tests': [
-            ["Simple Get Properties",
+            /*["Simple Get Properties",
             function(){
                 var d = debug.beginInitialInput("var x = {'x': 3, 'y': 4}");
                
@@ -32,7 +32,7 @@ function(compute,
                 
                 assert.equal(obj['x'].value, 3);
                 assert.equal(obj['y'].value, 4)
-            }],
+            }],*/
             
         ],
     };

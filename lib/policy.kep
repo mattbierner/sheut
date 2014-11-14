@@ -2,187 +2,197 @@
  * @fileOverview Operations for stepping through programs.
  */
 package (
-    test,
-    always,
-    never,
-    notComplete,
+    test
+    always
+    never
+    notComplete
     
-    not,
-    and,
-    or,
-    all,
-    any,
+    not
+    and
+    or
+    all
+    any
     
-    breakpoint,
+    breakpoint
     
-    depthGt,
-    depthGte,
-    depthEq,
+    depthGt
+    depthGte
+    depthEq
     
-    debuggerDgr,
-    statementDgr,
-    abrupt,
+    debuggerDgr
+    statementDgr
+    abrupt
     
-    line,
+    line
     sameLine)
 with
     import 'sheut/interpreter/debuggable' debuggable,
 
-    import 'sheut/fun' {foldl, foldr, map, args, identity, constant},
+    import 'sheut/fun' {
+        foldl
+        foldr
+        map
+        args
+        identity
+        constant},
     import 'sheut/run' {extract},
     import 'sheut/operations/context' context
 in {
 
 /* Location Operations
  ******************************************************************************/
-var containsLine = \location, line ->
+var containsLine := \location, line ->
     (location.start.line <= line && line <= location.end.line);
 
 /* Test Policies
  ******************************************************************************/
-test = \pred -> 
-    \current, next, previous ->
-        pred(current, next, previous) ? next : null;
+test := \pred -> 
+    \start current previous ->
+        [pred(start, current, previous), current];
 
-always =  \_, next, _ -> next;
+always :=  \_ current _ -> [true, current];
 
-never = \_, _, _ -> null;
+never := \_ current _ -> [false, current];
 
-var testNext = \f ->
-    \_, next ->
-        f(next.debug) ? next : null;
+var testNext := \pred ->
+    test \ _ current ->
+        pred(current.debug);
 
-notComplete = testNext(\d -> !d.complete);
+notComplete := testNext \d -> !d.complete;
 
 /* Policy Combinators
  ******************************************************************************/
 /**
  * 
  */
-not = \p -> (p \>>(!));
+not := \p ->
+    \start, current, next ->
+        let x = p(start, current, next) in [!x.(0), x.(1)];
 
 /**
  * 
  */
-var binary = \f ->
-    \a, b ->
-        \current, next, previous ->
-            f(a(current, next, previous), b(current, next, previous)) ? next : null;
-    
+var binary := \f ->
+    \a b ->
+        \start current previous -> let
+            x = a(start, current, previous),
+            y = b(start, current, previous)
+        in
+            [f(x.(0), y.(0)), current];
+
 /**
  * Are two policies both satisfied?
  */
-and = binary((&&));
+and := binary((&&));
 
 /**
  * Are either of two policies satisfied.
  */
-or = binary((||));
+or := binary((||));
 
 /**
  * Are all of the policies satisfied.
  * 
  * @param arr Array of policies
  */
-var alla = (foldl, and, always);
+var alla := foldl @ and @ always;
 
 /**
  * Are all of the policies, passed as arguments, satisfied.
  */
-all = args \>> alla;
+all := args \>> alla;
 
 /**
  * Are any of the policies satisfied.
  * 
  * @param arr Array of policies.
  */
-var anya = (foldl, or, never);
+var anya := foldl @ or @ never;
 
 /**
  * Are any of the policies, passed as arguments, satisfied.
  */
-any = args \>> anya;
+any := args \>> anya;
 
 /* Breakpoint Policies
  ******************************************************************************/
 /**
  * 
  */
-breakpoint = \current{breakpoints}, next, previous ->
+breakpoint := \current#{breakpoints} next previous ->
     anya(
         map(
-            \b -> breakpoints[b].test.bind(b),
+            \b -> breakpoints.(b).test.bind(b),
             Object.keys(breakpoints)))(current, next, previous);
 
 /* Depth Policies
  ******************************************************************************/
-var testDepth = \pred ->
-    \current, next -> 
+var testDepth := \pred ->
+    test \ current next -> 
         pred(current.debug.depth, next.debug.depth);
 
 /**
  * Next depth is greater than current depth.
  */
-depthGt = testDepth((<));
+depthGt := testDepth((<));
 
 /**
  * Next depth is greater than or equal to current depth.
  */
-depthGte = testDepth((<=));
+depthGte := testDepth((<=));
 
 /**
  * Next depth is the same as current depth.
  */
-depthEq = testDepth((===));
+depthEq := testDepth((===));
 
 /* Kind Policies
  ******************************************************************************/
-var testDgr = \pred ->
-    \_, next ->
+var testDgr := \pred ->
+    test \ _ next ->
         pred(next.debug.dgr);
 
-var dgrInstanceof = \kind ->
-    testDgr(\dgr -> dgr instanceof kind);
+var dgrInstanceof := \kind ->
+    testDgr \ dgr -> dgr instanceof kind;
 
-debuggerDgr = dgrInstanceof(debuggable.DebuggerDebuggable);
+debuggerDgr := dgrInstanceof(debuggable.DebuggerDebuggable);
 
-statementDgr = dgrInstanceof(debuggable.StatementDebuggable);
+statementDgr := dgrInstanceof(debuggable.StatementDebuggable);
 
-var callDgr = or(
+var callDgr := or(
     dgrInstanceof(debuggable.PreCallDebuggable),
     dgrInstanceof(debuggable.PostCallDebuggable));
 
 /* Policies
  ******************************************************************************/
-abrupt = any(
+abrupt := any(
     debuggerDgr,
     breakpoint);
-
 
 /* Location
  ******************************************************************************/
 /**
  * Next location contains `line`
  */
-line = \line ->
-    \_, next ->
+line := \line ->
+    test(\_, next ->
         extract(next, context.location, false,
             \nextLocation ->
-                containsLine(nextLocation, line));
+                containsLine(nextLocation, line)));
 
-        /*
-var location = \loc ->
+/*
+var location := \loc ->
     \_, next ->
         extract(next, context.location, false,
             \nextLocation ->
                 containsLocation(loc, nextLocation));
 */
         
-sameLine = \current, next ->
+sameLine := test(\current, next ->
     extract(current, context.location, false,
         \currentLocation ->
             extract(next, context.location, false,
                 \nextLocation ->
-                    (currentLocation && nextLocation && containsLine(currentLocation, nextLocation.start.line))));
+                    (currentLocation && nextLocation && containsLine(currentLocation, nextLocation.start.line)))));
 
 }

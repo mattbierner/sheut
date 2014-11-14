@@ -3,36 +3,48 @@
  */
 package (
 // Base Steps
-    next,
-    nextWhile,
+    next
+    nextWhile
     
 // Stepping
-    step,
-    stepNextLine,
-    stepTo,
-    finish,
-    run,
-    stepOver,
-    stepOut,
+    step
+    stepNextLine
+    stepTo
+    finish
+    run
+    stepOver
+    stepOut
     
 // Step Combinators
-    sequencea,
+    sequencea
     sequence)
 with
-    import 'atum/compute/tail' {trampoline},
-    import 'sheut/interpreter/debuggable' {Debuggable},
+    import 'atum::compute::tail' {trampoline},
+    import 'sheut::interpreter::debuggable' {Debuggable},
     
-    import 'sheut/debug_state' {createForDgr, isComplete},
-    import 'sheut/fun' {foldl, args},
-    import 'sheut/policy' policy {abrupt, notComplete, not, and, all, or, any, sameLine}
+    import 'sheut::debug_state' {
+        createForDgr
+        isComplete},
+    import 'sheut::fun' {
+        foldl
+        args},
+    import 'sheut::policy' policy#{
+        abrupt
+        notComplete
+        not
+        and
+        all
+        or
+        any
+        sameLine}
 in {
 
 /* Basic Operations
  ******************************************************************************/
 var nextContext = \s ->
-    (isComplete(s) ?
-        s :
-        createForDgr(trampoline(s.k(null, s.ctx))));
+    ?isComplete s
+        :s
+        :createForDgr(trampoline(s.k(null, s.ctx)));
 
 /**
  * Perform a single step to the next debuggable in the program.
@@ -48,14 +60,15 @@ next = \d ->
  * @param policy
  * @param d Debugger.
  */
-nextWhile = \policy, d -> {
-    var n = d, c = n;
+nextWhile = \policy d -> {
+    var n = [true, d],
+        c = d;
     var previous;
     do {
         previous = c;
-        c = next(n);
+        c = next(n.(1));
         n = policy(d, c, previous);
-    } while (n);
+    } while (n.(0));
     return c;
 };
 
@@ -66,10 +79,10 @@ nextWhile = \policy, d -> {
  * 
  * This will hit whatever the next statement is, including inside functions.
  */
-step = (nextWhile,
+step = nextWhile @
     and(
         notComplete,
-        not <| policy.statementDgr));
+        not policy.statementDgr);
 
 /**
  * Perform a single step to the next line in the program in a block of statements.
@@ -77,28 +90,28 @@ step = (nextWhile,
  * Will hit debug points and function calls, even on the same line.
  * 
  */
-stepNextLine = (nextWhile,
+stepNextLine = nextWhile @
     all(
         notComplete,
         sameLine,
         any(
-            not <| policy.statementDgr,
+            not policy.statementDgr,
             policy.depthEq),
-        not <| abrupt));
+        not abrupt);
 
 /**
  * Step to completion.
  */
-finish = (nextWhile,
-    notComplete);
+finish = nextWhile @
+    notComplete;
 
 /**
  * Step until debugger statement or breakpoint is hit.
  */
-run = (nextWhile,
+run = nextWhile @
     all(
         notComplete,
-        not <| abrupt));
+        not abrupt);
 
 /**
  * Step over a function call.
@@ -106,13 +119,13 @@ run = (nextWhile,
  * Will also stop for breakpoints and debugger statements even if these occur
  * inside of the stepped over function.
  */
-stepOver = (nextWhile,
+stepOver = nextWhile @
     all(
         notComplete,
         any(
             policy.depthGt,
-            not <| policy.statementDgr),
-        not <| abrupt));
+            not policy.statementDgr),
+        not abrupt);
 
 /**
  * Step out of a function call.
@@ -123,11 +136,11 @@ stepOver = (nextWhile,
  * Unlike step over, this does not step to the next statement, so expression
  * with multiple function calls can step into each function.
  */
-stepOut = (nextWhile,
+stepOut = nextWhile @
     all(
         notComplete,
         policy.depthGte,
-        not <| abrupt));
+        not abrupt);
 
 /* Step Combinators
  ******************************************************************************/
@@ -140,7 +153,7 @@ stepOut = (nextWhile,
 sequencea = \steps ->
     \d ->
         foldl(
-            \p, c -> c(p),
+            \p c -> c(p),
             d,
             steps);
 

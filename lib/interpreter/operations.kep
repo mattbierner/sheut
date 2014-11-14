@@ -2,32 +2,40 @@
  * @fileOverview
  */
 package (
-    debug,
+    debug
     
-    debuggable,
-    debuggableStatement,
+    debuggable
+    debuggableStatement
     debuggableCall)
 with
-    import 'atum/compute' {abrupt, bind, callcc, computeContext, just, next},
-    import 'sheut/interpreter/debuggable' atum_debuggable
+    import 'atum::compute' {
+        abrupt
+        bind
+        callcc
+        computeContext
+        just
+        next},
+    import 'atum::compute::statement' statement,
+    import 'sheut::interpreter::debuggable' atum_debuggable
 in {
 
-debug = \p, f ->
+debug = \p f ->
     bind(computeContext, \ctx ->
         next(
-            callcc(\k -> abrupt(f(k, ctx))),
+            callcc \ k ->
+               abrupt <| f(k, ctx),
             p));
 
 debuggable = \p ->
     debug(p, atum_debuggable.Debuggable.create);
 
 debuggableStatement = \p ->
-    debug(p, atum_debuggable.StatementDebuggable.create);
+   debug(p, atum_debuggable.StatementDebuggable.create);
 
-debuggableCall = \p -> 
+debuggableCall = \p ->
     debug(
         bind(p, \x -> 
-            debug(just(x), atum_debuggable.PostCallDebuggable.create)),
+            debug(just x, atum_debuggable.PostCallDebuggable.create)),
         atum_debuggable.PreCallDebuggable.create);
 
 }

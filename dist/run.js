@@ -1,30 +1,26 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/run.kep'
+ * THIS FILE IS AUTO GENERATED FROM 'lib/run.kep'
  * DO NOT EDIT
 */
 define(["require", "exports", "sheut/debug", "sheut/state"], (function(require, exports, __o, __o0) {
     "use strict";
-    var evaluate, extract, transform;
-    var __o = __o,
-        debugInitial = __o["debugInitial"],
-        __o0 = __o0,
-        getResult = __o0["getResult"];
-    var ret = (function(x) {
-        return x;
-    });
-    var thr = (function(x) {
-        throw x;
-    });
-    var finish = (function() {
-        var args = arguments; {
-            var __o1 = require("sheut/step"),
-                finish = __o1["finish"];
-            return finish.apply(null, args);
-        }
-    });
-    var execute = (function(d, p, ok, err) {
-        return getResult(finish(debugInitial(p, d.debug.ctx, ok, err)));
-    });
+    var evaluate, extract, transform, debugInitial = __o["debugInitial"],
+        getResult = __o0["getResult"],
+        ret = (function(x) {
+            return x;
+        }),
+        thr = (function(x) {
+            throw x;
+        }),
+        finish = (function() {
+            var args = arguments,
+                __o1 = require("sheut/step"),
+                finish0 = __o1["finish"];
+            return finish0.apply(null, args);
+        }),
+        execute = (function(d, p, ok, err) {
+            return getResult(finish(debugInitial(p, d.debug.ctx, ok, err)));
+        });
     (evaluate = (function(d, p, ok, err) {
         return execute(d, p, (ok || ret), (err || thr));
     }));
@@ -36,7 +32,7 @@ define(["require", "exports", "sheut/debug", "sheut/state"], (function(require, 
     (transform = (function(d, p, ok, err) {
         return finish(debugInitial(p, d.debug.ctx, ok, err));
     }));
-    (exports.evaluate = evaluate);
-    (exports.extract = extract);
-    (exports.transform = transform);
-}))
+    (exports["evaluate"] = evaluate);
+    (exports["extract"] = extract);
+    (exports["transform"] = transform);
+}));

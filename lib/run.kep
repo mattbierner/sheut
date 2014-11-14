@@ -2,23 +2,21 @@
  * @fileOverview
  */
 package (
-    evaluate,
-    extract,
+    evaluate
+    extract
     transform)
 with
-    import 'sheut/debug' {debugInitial},
-    import 'sheut/state' {getResult}
+    import 'sheut::debug' {debugInitial},
+    import 'sheut::state' {getResult}
 in {
 
 var ret = \x -> x;
 var thr = \x -> { throw x; };
 
-var finish = \args(...) -> {
-    with
-        import 'sheut/step' {finish}
-    in {
-        return finish.apply(null, args);
-    }
+var finish = \-args(...) -> with
+    import 'sheut/step' {finish}
+in {
+    return finish.apply(null, args);
 };
 
 /**
@@ -31,7 +29,7 @@ var finish = \args(...) -> {
  * @param ok Success continuation.
  * @param err Failure continuation.
  */
-var execute = \d, p, ok, err ->
+var execute = \d p ok err ->
     (debugInitial(p, d.debug.ctx, ok, err)
         |> finish
         |> getResult);
@@ -46,7 +44,7 @@ var execute = \d, p, ok, err ->
  * @param [ok] Success callback.
  * @param [err] Failure callback.
  */
-evaluate = \d, p, ok, err ->
+evaluate = \d p ok err ->
     execute(
         d,
         p,
@@ -63,12 +61,12 @@ evaluate = \d, p, ok, err ->
  * @param [def] Default value to return when `p` fails.
  * @param [ok] Optional callback to pass the result successful result through before returning it.
  */
-extract = \d, p, def, ok ->
+extract = \d p def ok ->
     execute(
         d,
         p,
         (ok || ret),
-        \_, _ -> def);
+        \_ _ -> def);
 
 /**
  * Evaluate `p` in the given debug context and return the next debug context
@@ -79,7 +77,7 @@ extract = \d, p, def, ok ->
  * @param [ok] Success completion.
  * @param [err] Failure completion.
  */
-transform = \d, p, ok, err ->
+transform = \d p ok err ->
     (debugInitial(p, d.debug.ctx, ok, err)
         |> finish);
 

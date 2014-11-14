@@ -15,29 +15,29 @@ package (
     mapSemantics)
 
 with 
-    import 'atum/compute' compute,
-    import 'atum/compute/statement' statement,
-    import 'atum/operations/execution_context' execution_context,
-    import 'atum/semantics/declaration' declaration_semantics,
-    import 'atum/semantics/expression' expression_semantics,
-    import 'atum/semantics/func' function_semantics,
-    import 'atum/semantics/program' program_semantics,
+    import 'atum::compute' compute,
+    import 'atum::compute::statement' statement,
+    import 'atum::operations::execution_context' execution_context,
+    import 'atum::semantics::declaration' declaration_semantics,
+    import 'atum::semantics::expression' expression_semantics,
+    import 'atum::semantics::func' function_semantics,
+    import 'atum::semantics::program' program_semantics,
     
-    import 'atum/semantics/semantics' semantics,
-    import 'atum/semantics/value' value_semantics,
+    import 'atum::semantics::semantics' semantics,
+    import 'atum::semantics::value' value_semantics,
     
-    import 'sheut/interpreter/debuggable' atum_debuggable,
-    import 'sheut/interpreter/operations' debug,
+    import 'sheut::interpreter::debuggable' atum_debuggable,
+    import 'sheut::interpreter::operations' debug,
     
-    import 'sheut/fun' fun
+    import 'sheut::fun' fun
 in {
 
 /**
  * Is an array of source elements strict code?
  */
-var isStrict = function(elems) {
-    if (elems && elems.length && elems[0].type === 'ExpressionStatement') {
-        var first = elems[0].expression;
+var isStrict = \elems -> {
+    if (elems && elems.length && elems.(0).type === 'ExpressionStatement') {
+        var first = elems.(0).expression;
         return (first && first.type === 'Literal' && first.kind ==='string' && first.value === 'use strict');
     }
     return false;
@@ -45,98 +45,88 @@ var isStrict = function(elems) {
 
 /* General Computations
  ******************************************************************************/
-var input = function(loc, body) {
-    return compute.next(
+var input = \loc body ->
+    compute.next(
         execution_context.setLoc(loc),
         body);
+
+mapSemantics = \-args(...) -> {
+    mapSemantics.apply(undefined, args);
 };
 
-mapSemantics = \args(...) -> {
-    return mapSemantics.apply(undefined, args);
-};
+var merge = \[a b] [c d] -> [
+    fun.concat(a, c),
+    fun.concat(b, d)];
 
-/* Declaration
- ******************************************************************************/
-/**
- * Maps AST nodes for declarations to semantics computations.
- */
-declarations = function(node) {
-    if (!node)
-        return compute.empty;
+var decls = \node -> {
+    if (!node) return [[], []];
+    
+    if (node.length) return fun.map(decls, node).reduceRight(merge, [[], []]);
     
     switch (node.type) {
     case 'SwitchCase':
-        return compute.sequencea(
-            fun.map(declarations, node.consequent));
+        return decls(node.consequent);
     
     case 'CatchClause':
-        return declarations(node.body);
+        return decls(node.body);
     
     case 'BlockStatement':
-        return compute.sequencea(
-            fun.map(declarations, node.body));
+        return decls(node.body);
     
     case 'IfStatement':
-        return compute.next(
-            declarations(node.consequent),
-            declarations(node.alternate));
+        return merge(
+            decls(node.consequent),
+            decls(node.alternate));
     
     case 'SwitchStatement':
-        return compute.sequencea(
-            fun.map(declarations, node.cases));
+        return decls(node.cases);
     
     case 'TryStatement':
-        return compute.sequence(
-            declarations(node.block),
-            declarations(node.handler),
-            declarations(node.finalizer));
+        return merge(
+            decls(node.block),
+            merge(
+                decls(node.handler),
+                decls(node.finalizer)));
     
     case 'WithStatement':
     case 'WhileStatement':
     case 'DoWhileStatement':
-        return declarations(node.body);
+        return decls(node.body);
     
     case 'ForStatement':
-        return compute.next(
-            declarations(node.init),
-            declarations(node.body));
+        return merge(
+            decls(node.init),
+            decls(node.body));
     
     case 'ForInStatement':
-        return compute.next(
-            declarations(node.left),
-            declarations(node.body));
+        return merge(
+            decls(node.left),
+            decls(node.body));
     
     case 'FunctionDeclaration':
-        return let
-            id = (node.id === null ? null : node.id.name),
-            params = fun.map(function(x) { return x.name; }, node.params),
-            strict = isStrict(node.body.body)
-        in
-            declaration_semantics.functionDeclaration(
-                id,
-                strict,
-                params,
-                node.body,
-                declarations(node.body),
-                mapSemantics(node.body));
-    
-    case 'VariableDeclaration':
-        return declaration_semantics.variableDeclaration(
-            fun.map(declarations, node.declarations));
+        var id = node.id.name,
+            params = fun.map((.name), node.params),
+            strict = isStrict(node.body.body);
+        return [
+            [],
+            [[id,
+              declaration_semantics.functionDeclaration(
+                  id,
+                  strict,
+                  params,
+                  node.body,
+                  decls(node.body),
+                  mapSemantics(node.body))]]];
         
+    case 'VariableDeclaration':
+        return decls(node.declarations);
+    
     case 'VariableDeclarator':
-        return declaration_semantics.variableDeclarator(node.id.name);
+        return [
+            [node.id.name],
+            []];
     }
-    return compute.empty;
-};
-
-/**
- * 
- */
-var sourceBody = function(elems) {
-    return program_semantics.sourceBody(
-        isStrict(elems),
-        fun.map(mapSemantics, elems));
+    return [[], []];
 };
 
 /* Statements
@@ -154,61 +144,47 @@ var debuggerStatement = debug.debug(
     atum_debuggable.DebuggerDebuggable.create);
 
 var declarationStatement = \vars ->
-    debug.debuggableStatement(semantics.declarationStatement(vars));
+    debug.debuggableStatement <| semantics.declarationStatement(vars);
 
 var blockStatement = \body ->
-    (!body.length ?
-        emptyStatement :
-        semantics.blockStatement(body));
+    ?!body.length
+        :emptyStatement
+        :semantics.blockStatement(body);
 
-var expressionStatement = debuggableStatement(
-    semantics.expressionStatement);
+var expressionStatement = debuggableStatement <| semantics.expressionStatement;
 
-var ifStatement = debuggableStatement(
-    semantics.ifStatement);
+var ifStatement = debuggableStatement <| semantics.ifStatement;
 
-var breakStatement = debuggableStatement(
-    semantics.breakStatement);
+var breakStatement = debuggableStatement <| semantics.breakStatement;
 
-var continueStatement = debuggableStatement(
-    semantics.continueStatement);
+var continueStatement = debuggableStatement <| semantics.continueStatement;
 
-var returnStatement = debuggableStatement(
-    semantics.returnStatement);
+var returnStatement = debuggableStatement <| semantics.returnStatement;
 
-var throwStatement = debuggableStatement(
-    semantics.throwStatement);
+var throwStatement = debuggableStatement <| semantics.throwStatement;
 
-var withStatement = debuggableStatement(
-    semantics.withStatement);
+var withStatement = debuggableStatement <| semantics.withStatement;
 
-var switchStatement = debuggableStatement(
-    semantics.switchStatement);
+var switchStatement = debuggableStatement <| semantics.switchStatement;
 
-var tryStatement = debuggableStatement(
-    semantics.tryStatement);
+var tryStatement = debuggableStatement <| semantics.tryStatement;
 
-var whileStatement = debuggableStatement(
-    semantics.whileStatement);
+var whileStatement = debuggableStatement <| semantics.whileStatement;
 
-var doWhileStatement = debuggableStatement(
-    semantics.doWhileStatement);
+var doWhileStatement = debuggableStatement <| semantics.doWhileStatement;
 
-var forStatement = debuggableStatement(
-    \init, test, update, body ->
-        semantics.forStatement(
-            debug.debuggable(init),
-            debug.debuggable(test),
-            debug.debuggable(update),
-            body));
+var forStatement = debuggableStatement \ init test update body ->
+    semantics.forStatement(
+        debug.debuggable(init),
+        debug.debuggable(test),
+        debug.debuggable(update),
+        body);
 
-var forInStatement = debuggableStatement(
-    semantics.forInStatement);
+var forInStatement = debuggableStatement <| semantics.forInStatement;
 
-var forVarInStatement = debuggableStatement(
-    semantics.forVarInStatement);
+var forVarInStatement = debuggableStatement <| semantics.forVarInStatement;
 
-/* Statements
+/* Expressions
  ******************************************************************************/
 var thisExpression = semantics.thisExpression;
 
@@ -243,17 +219,15 @@ var functionExpression = semantics.functionExpression;
 /**
  * 
  */
-sourceElements = function(elems) {
-    return program_semantics.sourceElements(
-        isStrict(elems),
-        fun.map(declarations, elems),
-        fun.map(mapSemantics, elems));
-};
+sourceElements = \elems ->
+    program_semantics.sourceElements(
+        isStrict elems,
+        decls elems,
+        mapSemantics elems);
 
 program = program_semantics.program;
 
 programBody = program_semantics.programBody;
-
 
 program = fun.compose(
     program_semantics.program,
@@ -266,20 +240,20 @@ var identifier = semantics.identifier;
 var literal = semantics.literal;
 
 mapSemantics = (\-> {
-    var mapper = function(node) {
+    var mapper = \node -> {
         var loc = node.loc;
         
         switch (node.type) {
     // Clauses
         case 'SwitchCase':
             return {
-                'test' : mapSemantics(node.test),
+                'test' : mapSemantics node.test,
                 'consequent': (node.consequent && 
                     fun.map(mapSemantics, node.consequent))
             };
            
         case 'CatchClause':
-            return mapSemantics(node.body);
+            return mapSemantics node.body;
     
     // Statement
         case 'EmptyStatement':
@@ -294,13 +268,13 @@ mapSemantics = (\-> {
         
         case 'ExpressionStatement':
             return expressionStatement(
-                mapSemantics(node.expression));
+                mapSemantics node.expression);
         
         case 'IfStatement':
             return ifStatement(
-                mapSemantics(node.test),
-                mapSemantics(node.consequent),
-                mapSemantics(node.alternate));
+                mapSemantics node.test,
+                mapSemantics node.consequent,
+                mapSemantics node.alternate);
             
         case 'LabeledStatement':
             break;
@@ -313,57 +287,57 @@ mapSemantics = (\-> {
         
         case 'ReturnStatement':
             return returnStatement(
-                mapSemantics(node.argument));
+                mapSemantics node.argument);
         
         case 'ThrowStatement':
             return throwStatement(
-                mapSemantics(node.argument));
+                mapSemantics node.argument);
         
         case 'WithStatement':
             return withStatement(
-                mapSemantics(node.object),
-                mapSemantics(node.body));
+                mapSemantics node.object,
+                mapSemantics node.body);
         
         case 'SwitchStatement':
             return switchStatement(
-                mapSemantics(node.discriminant),
+                mapSemantics node.discriminant,
                 fun.map(mapSemantics, node.cases));
     
         case 'TryStatement':
             return tryStatement(
-                mapSemantics(node.block),
+                mapSemantics node.block,
                 node.handler && node.handler.param,
-                mapSemantics(node.handler),
-                mapSemantics(node.finalizer));
+                mapSemantics node.handler,
+                mapSemantics node.finalizer);
             
         case 'WhileStatement':
             return whileStatement(
-                mapSemantics(node.test),
-                mapSemantics(node.body));
+                mapSemantics node.test,
+                mapSemantics node.body);
         
         case 'DoWhileStatement':
             return doWhileStatement(
-                mapSemantics(node.body),
-                mapSemantics(node.test));
+                mapSemantics node.body,
+                mapSemantics node.test);
         
         case 'ForStatement':
             return forStatement(
-                mapSemantics(node.init),
-                mapSemantics(node.test),
-                mapSemantics(node.update),
-                mapSemantics(node.body));
+                mapSemantics node.init,
+                mapSemantics node.test,
+                mapSemantics node.update,
+                mapSemantics node.body);
         
         case 'ForInStatement':
             if (node.left.type === 'VariableDeclaration')
                 return forVarInStatement(
-                    node.left.declarations[0].id.name,
-                    mapSemantics(node.right),
-                    mapSemantics(node.body));
+                    node.left.declarations.(0).id.name,
+                    mapSemantics node.right,
+                    mapSemantics node.body);
             
             return forInStatement(
-                mapSemantics(node.left),
-                mapSemantics(node.right),
-                mapSemantics(node.body));
+                mapSemantics node.left,
+                mapSemantics node.right,
+                mapSemantics node.body);
         
     // Expression
         case 'ThisExpression':
@@ -376,52 +350,52 @@ mapSemantics = (\-> {
         case 'UnaryExpression':
             return unaryExpression(
                 node.operator,
-                mapSemantics(node.argument));
+                mapSemantics node.argument);
         
         case 'UpdateExpression':
             return updateExpression(
                 node.operator,
                 node.prefix,
-                mapSemantics(node.argument));
+                mapSemantics node.argument);
         
         case 'BinaryExpression':
             return binaryExpression(
                 node.operator,
-                mapSemantics(node.left),
-                mapSemantics(node.right));
+                mapSemantics node.left,
+                mapSemantics node.right);
         
         case 'LogicalExpression':
             return logicalExpression(
                 node.operator,
-                mapSemantics(node.left),
-                mapSemantics(node.right));
+                mapSemantics node.left,
+                mapSemantics node.right);
         
         case 'AssignmentExpression':
             return assignmentExpression(
                 node.operator,
-                mapSemantics(node.left),
-                mapSemantics(node.right));
+                mapSemantics node.left,
+                mapSemantics node.right);
         
         case 'ConditionalExpression':
             return conditionalExpression(
-                mapSemantics(node.test),
-                mapSemantics(node.consequent),
-                mapSemantics(node.alternate));
+                mapSemantics node.test,
+                mapSemantics node.consequent,
+                mapSemantics node.alternate);
         
         case 'NewExpression':
             return newExpression(
-                mapSemantics(node.callee),
+                mapSemantics node.callee,
                 fun.map(mapSemantics, node.args));
         
         case 'CallExpression':
             return callExpression(
-                mapSemantics(node.callee),
+                mapSemantics node.callee,
                 fun.map(mapSemantics, node.args));
             
         case 'MemberExpression':
-            return (node.computed ?
-                computedMemberExpression(mapSemantics(node.object), mapSemantics(node.property)) :
-                memberExpression(mapSemantics(node.object), node.property));
+            return ?node.computed
+                :computedMemberExpression(mapSemantics node.object, mapSemantics node.property)
+                :memberExpression(mapSemantics node.object, node.property);
         
         case 'ArrayExpression':
             return arrayExpression(
@@ -436,7 +410,7 @@ mapSemantics = (\-> {
                 node.id,
                 node.params,
                 node.body,
-                declarations(node.body),
+                decls(node.body),
                 mapSemantics(node.body));
         
         case 'FunctionDeclaration':
@@ -458,7 +432,7 @@ mapSemantics = (\-> {
         case 'VariableDeclarator':
             return variableDeclarator(
                 node.id,
-                mapSemantics(node.init));
+                mapSemantics node.init);
         
     // Value
         case 'Identifier':
@@ -470,14 +444,14 @@ mapSemantics = (\-> {
         return null;
     };
     
-    return function(node) {
+    return \node -> {
         if (!node)
             return node;
-        if (Array.isArray(node))
+        else if (Array.isArray(node))
             return fun.map(mapSemantics, node);
         
         var result = mapper(node);
-        return (typeof result === 'function' ? input(node.loc, result) : result);
+        return ?typeof result === 'function' : input(node.loc, result) : result;
     };
 }());
 

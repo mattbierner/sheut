@@ -1,19 +1,16 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/interpreter/operations.kep'
+ * THIS FILE IS AUTO GENERATED FROM 'lib/interpreter/operations.kep'
  * DO NOT EDIT
 */
-define(["require", "exports", "atum/compute", "sheut/interpreter/debuggable"], (function(require, exports, __o,
-    atum_debuggable) {
+define(["require", "exports", "atum/compute", "atum/compute/statement", "sheut/interpreter/debuggable"], (function(
+    require, exports, __o, statement, atum_debuggable) {
     "use strict";
-    var debug, debuggable, debuggableStatement, debuggableCall;
-    var __o = __o,
-        abrupt = __o["abrupt"],
+    var debug, debuggable, debuggableStatement, debuggableCall, abrupt = __o["abrupt"],
         bind = __o["bind"],
         callcc = __o["callcc"],
         computeContext = __o["computeContext"],
         just = __o["just"],
-        next = __o["next"],
-        atum_debuggable = atum_debuggable;
+        next = __o["next"];
     (debug = (function(p, f) {
         return bind(computeContext, (function(ctx) {
             return next(callcc((function(k) {
@@ -32,8 +29,8 @@ define(["require", "exports", "atum/compute", "sheut/interpreter/debuggable"], (
             return debug(just(x), atum_debuggable.PostCallDebuggable.create);
         })), atum_debuggable.PreCallDebuggable.create);
     }));
-    (exports.debug = debug);
-    (exports.debuggable = debuggable);
-    (exports.debuggableStatement = debuggableStatement);
-    (exports.debuggableCall = debuggableCall);
-}))
+    (exports["debug"] = debug);
+    (exports["debuggable"] = debuggable);
+    (exports["debuggableStatement"] = debuggableStatement);
+    (exports["debuggableCall"] = debuggableCall);
+}));

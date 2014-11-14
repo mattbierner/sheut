@@ -19,3 +19,15 @@
 [submodule "dependencies/amulet"]
 	path = dependencies/amulet
 	url = https://github.com/mattbierner/amulet
+[submodule "dependencies/bes"]
+	path = dependencies/bes
+	url = https://github.com/mattbierner/bes.git
+[submodule "dependencies/hamt"]
+	path = dependencies/hamt
+	url = https://github.com/mattbierner/hamt.git
+[submodule "dependencies/bennu"]
+	path = dependencies/bennu
+	url = https://github.com/mattbierner/bennu.git
+[submodule "dependencies/seshet"]
+	path = dependencies/seshet
+	url = https://github.com/mattbierner/seshet.git

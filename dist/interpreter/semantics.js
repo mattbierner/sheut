@@ -1,5 +1,5 @@
 /*
- * THIS FILE IS AUTO GENERATED from 'lib/interpreter/semantics.kep'
+ * THIS FILE IS AUTO GENERATED FROM 'lib/interpreter/semantics.kep'
  * DO NOT EDIT
 */
 define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/operations/execution_context",
@@ -9,141 +9,128 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
 ], (function(require, exports, compute, statement, execution_context, declaration_semantics, expression_semantics,
     function_semantics, program_semantics, semantics, value_semantics, atum_debuggable, debug, fun) {
     "use strict";
-    var sourceElements, declarations, program, programBody, mapSemantics;
-    var compute = compute,
-        statement = statement,
-        execution_context = execution_context,
-        declaration_semantics = declaration_semantics,
-        expression_semantics = expression_semantics,
-        function_semantics = function_semantics,
-        program_semantics = program_semantics,
-        semantics = semantics,
-        value_semantics = value_semantics,
-        atum_debuggable = atum_debuggable,
-        debug = debug,
-        fun = fun;
-    var isStrict = (function(elems) {
-        if (((elems && elems.length) && (elems[0].type === "ExpressionStatement"))) {
-            var first = elems[0].expression;
-            return (((first && (first.type === "Literal")) && (first.kind === "string")) && (first.value ===
-                "use strict"));
-        }
-        return false;
-    });
-    var input = (function(loc, body) {
-        return compute.next(execution_context.setLoc(loc), body);
-    });
+    var sourceElements, declarations, program, programBody, mapSemantics, f, f0, f1, f2, f3, f4, f5, f6, f7, f8,
+            f9, f10, f11, f12, x, y, isStrict = (function(elems) {
+                if (((elems && elems.length) && (elems[0].type === "ExpressionStatement"))) {
+                    var first = elems[0].expression;
+                    return (((first && (first.type === "Literal")) && (first.kind === "string")) && (first.value ===
+                        "use strict"));
+                }
+                return false;
+            }),
+        input = (function(loc, body) {
+            return compute.next(execution_context.setLoc(loc), body);
+        });
     (mapSemantics = (function() {
         var args = arguments;
-        return mapSemantics.apply(undefined, args);
+        mapSemantics.apply(undefined, args);
     }));
-    (declarations = (function(node) {
-        if (!node) return compute.empty;
-        switch (node.type) {
-            case "SwitchCase":
-                return compute.sequencea(fun.map(declarations, node.consequent));
-            case "CatchClause":
-                return declarations(node.body);
-            case "BlockStatement":
-                return compute.sequencea(fun.map(declarations, node.body));
-            case "IfStatement":
-                return compute.next(declarations(node.consequent), declarations(node.alternate));
-            case "SwitchStatement":
-                return compute.sequencea(fun.map(declarations, node.cases));
-            case "TryStatement":
-                return compute.sequence(declarations(node.block), declarations(node.handler),
-                    declarations(node.finalizer));
-            case "WithStatement":
-            case "WhileStatement":
-            case "DoWhileStatement":
-                return declarations(node.body);
-            case "ForStatement":
-                return compute.next(declarations(node.init), declarations(node.body));
-            case "ForInStatement":
-                return compute.next(declarations(node.left), declarations(node.body));
-            case "FunctionDeclaration":
-                return (function() {
-                    {
-                        var id = ((node.id === null) ? null : node.id.name),
-                            params = fun.map((function(x) {
-                                return x.name;
-                            }), node.params),
-                            strict = isStrict(node.body.body);
-                        return declaration_semantics.functionDeclaration(id, strict, params, node.body,
-                            declarations(node.body), mapSemantics(node.body));
-                    }
-                })
-                    .call(this);
-            case "VariableDeclaration":
-                return declaration_semantics.variableDeclaration(fun.map(declarations, node.declarations));
-            case "VariableDeclarator":
-                return declaration_semantics.variableDeclarator(node.id.name);
-        }
-        return compute.empty;
-    }));
-    var sourceBody = (function(elems) {
-        return program_semantics.sourceBody(isStrict(elems), fun.map(mapSemantics, elems));
-    });
-    var debuggableStatement = (function(f) {
-        return fun.compose(debug.debuggableStatement, f);
-    });
-    var emptyStatement = debug.debuggableStatement(semantics.emptyStatement);
-    var debuggerStatement = debug.debug(statement.empty, atum_debuggable.DebuggerDebuggable.create);
-    var declarationStatement = (function(vars) {
-        return debug.debuggableStatement(semantics.declarationStatement(vars));
-    });
-    var blockStatement = (function(body) {
-        return (!body.length ? emptyStatement : semantics.blockStatement(body));
-    });
-    var expressionStatement = debuggableStatement(semantics.expressionStatement);
-    var ifStatement = debuggableStatement(semantics.ifStatement);
-    var breakStatement = debuggableStatement(semantics.breakStatement);
-    var continueStatement = debuggableStatement(semantics.continueStatement);
-    var returnStatement = debuggableStatement(semantics.returnStatement);
-    var throwStatement = debuggableStatement(semantics.throwStatement);
-    var withStatement = debuggableStatement(semantics.withStatement);
-    var switchStatement = debuggableStatement(semantics.switchStatement);
-    var tryStatement = debuggableStatement(semantics.tryStatement);
-    var whileStatement = debuggableStatement(semantics.whileStatement);
-    var doWhileStatement = debuggableStatement(semantics.doWhileStatement);
-    var forStatement = debuggableStatement((function(init, test, update, body) {
-        return semantics.forStatement(debug.debuggable(init), debug.debuggable(test), debug.debuggable(
-            update), body);
-    }));
-    var forInStatement = debuggableStatement(semantics.forInStatement);
-    var forVarInStatement = debuggableStatement(semantics.forVarInStatement);
-    var thisExpression = semantics.thisExpression;
-    var sequenceExpression = semantics.sequenceExpression;
-    var unaryExpression = semantics.unaryExpression;
-    var updateExpression = semantics.updateExpression;
-    var binaryExpression = semantics.binaryExpression;
-    var logicalExpression = semantics.logicalExpression;
-    var assignmentExpression = semantics.assignmentExpression;
-    var conditionalExpression = semantics.conditionalExpression;
-    var newExpression = semantics.newExpression;
-    var callExpression = (function(f, g) {
-        return (function() {
-            return f(g.apply(null, arguments));
-        });
-    })(debug.debuggableCall, semantics.callExpression);
-    var memberExpression = semantics.memberExpression;
-    var computedMemberExpression = semantics.computedMemberExpression;
-    var arrayExpression = semantics.arrayExpression;
-    var objectExpression = semantics.objectExpression;
-    var functionExpression = semantics.functionExpression;
+    var merge = (function(__o, __o0) {
+        var a = __o[0],
+            b = __o[1],
+            c = __o0[0],
+            d = __o0[1];
+        return [fun.concat(a, c), fun.concat(b, d)];
+    }),
+        decls = (function(node) {
+            if ((!node)) return [[], []];
+            if (node.length) return fun.map(decls, node)
+                .reduceRight(merge, [
+                    [],
+                    []
+                ]);
+            switch (node.type) {
+                case "SwitchCase":
+                    return decls(node.consequent);
+                case "CatchClause":
+                    return decls(node.body);
+                case "BlockStatement":
+                    return decls(node.body);
+                case "IfStatement":
+                    return merge(decls(node.consequent), decls(node.alternate));
+                case "SwitchStatement":
+                    return decls(node.cases);
+                case "TryStatement":
+                    return merge(decls(node.block), merge(decls(node.handler), decls(node.finalizer)));
+                case "WithStatement":
+                case "WhileStatement":
+                case "DoWhileStatement":
+                    return decls(node.body);
+                case "ForStatement":
+                    return merge(decls(node.init), decls(node.body));
+                case "ForInStatement":
+                    return merge(decls(node.left), decls(node.body));
+                case "FunctionDeclaration":
+                    var id = node.id.name,
+                        params = fun.map((function(x) {
+                            return x.name;
+                        }), node.params),
+                        strict = isStrict(node.body.body);
+                    return [[], [
+                        [id, declaration_semantics.functionDeclaration(id, strict, params, node.body,
+                            decls(node.body), mapSemantics(node.body))]
+                    ]];
+                case "VariableDeclaration":
+                    return decls(node.declarations);
+                case "VariableDeclarator":
+                    return [[node.id.name], []];
+            }
+            return [[], []];
+        }),
+        emptyStatement = debug.debuggableStatement(semantics.emptyStatement),
+        debuggerStatement = debug.debug(statement.empty, atum_debuggable.DebuggerDebuggable.create),
+        declarationStatement = (function(vars) {
+            return debug.debuggableStatement(semantics.declarationStatement(vars));
+        }),
+        blockStatement = (function(body) {
+            return ((!body.length) ? emptyStatement : semantics.blockStatement(body));
+        }),
+        expressionStatement = ((f = semantics.expressionStatement), fun.compose(debug.debuggableStatement, f)),
+        ifStatement = ((f0 = semantics.ifStatement), fun.compose(debug.debuggableStatement, f0)),
+        breakStatement = ((f1 = semantics.breakStatement), fun.compose(debug.debuggableStatement, f1)),
+        continueStatement = ((f2 = semantics.continueStatement), fun.compose(debug.debuggableStatement, f2)),
+        returnStatement = ((f3 = semantics.returnStatement), fun.compose(debug.debuggableStatement, f3)),
+        throwStatement = ((f4 = semantics.throwStatement), fun.compose(debug.debuggableStatement, f4)),
+        withStatement = ((f5 = semantics.withStatement), fun.compose(debug.debuggableStatement, f5)),
+        switchStatement = ((f6 = semantics.switchStatement), fun.compose(debug.debuggableStatement, f6)),
+        tryStatement = ((f7 = semantics.tryStatement), fun.compose(debug.debuggableStatement, f7)),
+        whileStatement = ((f8 = semantics.whileStatement), fun.compose(debug.debuggableStatement, f8)),
+        doWhileStatement = ((f9 = semantics.doWhileStatement), fun.compose(debug.debuggableStatement, f9)),
+        forStatement = ((f10 = (function(init, test, update, body) {
+            return semantics.forStatement(debug.debuggable(init), debug.debuggable(test), debug.debuggable(
+                update), body);
+        })), fun.compose(debug.debuggableStatement, f10)),
+        forInStatement = ((f11 = semantics.forInStatement), fun.compose(debug.debuggableStatement, f11)),
+        forVarInStatement = ((f12 = semantics.forVarInStatement), fun.compose(debug.debuggableStatement, f12)),
+        thisExpression = semantics.thisExpression,
+        sequenceExpression = semantics.sequenceExpression,
+        unaryExpression = semantics.unaryExpression,
+        updateExpression = semantics.updateExpression,
+        binaryExpression = semantics.binaryExpression,
+        logicalExpression = semantics.logicalExpression,
+        assignmentExpression = semantics.assignmentExpression,
+        conditionalExpression = semantics.conditionalExpression,
+        newExpression = semantics.newExpression,
+        callExpression = ((x = debug.debuggableCall), (y = semantics.callExpression), (function() {
+            var args = arguments;
+            return x(y.apply(null, args));
+        })),
+        memberExpression = semantics.memberExpression,
+        computedMemberExpression = semantics.computedMemberExpression,
+        arrayExpression = semantics.arrayExpression,
+        objectExpression = semantics.objectExpression,
+        functionExpression = semantics.functionExpression;
     (sourceElements = (function(elems) {
-        return program_semantics.sourceElements(isStrict(elems), fun.map(declarations, elems), fun.map(
-            mapSemantics, elems));
+        return program_semantics.sourceElements(isStrict(elems), decls(elems), mapSemantics(elems));
     }));
     (program = program_semantics.program);
     (programBody = program_semantics.programBody);
     (program = fun.compose(program_semantics.program, sourceElements));
-    var variableDeclarator = semantics.variableDeclarator;
-    var identifier = semantics.identifier;
-    var literal = semantics.literal;
+    var variableDeclarator = semantics.variableDeclarator,
+        identifier = semantics.identifier,
+        literal = semantics.literal;
     (mapSemantics = (function() {
         var mapper = (function(node) {
-            var loc = node.loc;
             switch (node.type) {
                 case "SwitchCase":
                     return ({
@@ -227,7 +214,7 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
                 case "ObjectExpression":
                     return objectExpression(node.properties);
                 case "FunctionExpression":
-                    return functionExpression(node.id, node.params, node.body, declarations(node.body),
+                    return functionExpression(node.id, node.params, node.body, decls(node.body),
                         mapSemantics(node.body));
                 case "FunctionDeclaration":
                     return statement.empty;
@@ -245,15 +232,15 @@ define(["require", "exports", "atum/compute", "atum/compute/statement", "atum/op
             return null;
         });
         return (function(node) {
-            if (!node) return node;
-            if (Array.isArray(node)) return fun.map(mapSemantics, node);
+            if ((!node)) return node;
+            else if (Array.isArray(node)) return fun.map(mapSemantics, node);
             var result = mapper(node);
-            return ((typeof result === "function") ? input(node.loc, result) : result);
+            return (((typeof result) === "function") ? input(node.loc, result) : result);
         });
     })());
-    (exports.sourceElements = sourceElements);
-    (exports.declarations = declarations);
-    (exports.program = program);
-    (exports.programBody = programBody);
-    (exports.mapSemantics = mapSemantics);
-}))
+    (exports["sourceElements"] = sourceElements);
+    (exports["declarations"] = declarations);
+    (exports["program"] = program);
+    (exports["programBody"] = programBody);
+    (exports["mapSemantics"] = mapSemantics);
+}));
