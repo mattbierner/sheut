@@ -1,5 +1,6 @@
 /**
- * @fileOverview
+ * @fileOverview Operations for accessing object values and properties in the
+ * hosted language.
  */
 package (
     getOwnPropertyNames
@@ -42,15 +43,15 @@ getOwnProperties = \obj ->
         getOwnPropertyNames(obj),
         \names ->
             bind(
-                map(get@obj, names) |> enumerationa,
+                enumerationa <| map(get@obj, names),
                 \values ->
-                    just(foldl(
-                        \p, name, i -> {
+                    just foldl(
+                        \p name i -> {
                             p.(name) = values.(i);
                             return p;
                         },
                         {},
-                        names))));
+                        names)));
 
 /**
  * Get the prototype of an object.

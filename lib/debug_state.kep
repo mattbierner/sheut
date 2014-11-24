@@ -2,10 +2,10 @@
  * @fileOverview
  */
 package (
-    DebugState,
-    createForDgr,
+    DebugState
+    createForDgr
     
-    isComplete,
+    isComplete
     
     inject)
 with
@@ -40,7 +40,7 @@ DebugState = record.declare(null, [
         self.depth = ?ctx.userData : ctx.userData.metadata.stack.length : 0;
     });
 
-createForDgr = \dgr#{k, ctx} -> 
+createForDgr = \dgr#{k ctx} -> 
     DebugState.create(dgr, k, ctx, dgr instanceof CompleteDebuggable);
 
 isComplete = (_ ?? .complete);

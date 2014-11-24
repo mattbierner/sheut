@@ -2,11 +2,11 @@
  * @fileOverview Breakpoint record and breakpoint specific policies.
  */
 package (
-    Breakpoint,
-    create,
+    Breakpoint
+    create
 
 // Base Policies
-    unconditional,
+    unconditional
     conditional)
 with
     import 'bes::record' record,

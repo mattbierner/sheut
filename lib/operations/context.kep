@@ -3,31 +3,33 @@
  */
 package (
 // Program Context
-    context,
+    context
     
 // Environment
-    environment,
-    getEnvironmentBindings,
-    getEnvironmentOuter,
-    getEnvironmentBinding,
+    environment
+    getEnvironmentBindings
+    getEnvironmentOuter
+    getEnvironmentBinding
     
 // Metadata
-    location,
+    location
     
 // Stack
-    stack,
-    getStackFrameName)
+    stack)
 with
-    import 'atum/compute' compute#{bind, just},
-    import 'atum/context/environment' {ObjectLexicalEnvironment},
-    import 'atum/semantics/expression' {logicalOr},
-    import 'atum/operations/environment' environment_ops#{getEnvironment},
-    import 'atum/operations/execution_context' execution_context,
-    import 'atum/operations/internal_reference' internal_reference,
-    import 'atum/operations/object' object,
-    import 'atum/operations/string' string,
-    import 'sheut/operations/reference' {getFrom, getValue},
-    import 'atum/operations/type_conversion' {toString},
+    import 'atum::compute' {bind just},
+    import 'atum::context::environment' {ObjectLexicalEnvironment},
+    import 'atum::semantics::expression' {logicalOr},
+    import 'atum::operations::environment' environment_ops#{getEnvironment},
+    import 'atum::operations::execution_context' execution_context#{
+        extract},
+    import 'atum::operations::internal_reference' internal_reference,
+    import 'atum::operations::object' object,
+    import 'atum::operations::string' string,
+    import 'sheut::operations::reference' {
+        dereference
+        getFrom},
+    import 'atum::operations::type_conversion' {toString},
     
     import 'hamt' hamt
 in {
@@ -44,22 +46,27 @@ context = execution_context.context;
 /**
  * Get the environment object,
  */
-environment = getFrom(getEnvironment);
+environment = getFrom getEnvironment;
 
 /**
- * Get a mapping for the bindings for an environment.
+ * Get a mapping of the bindings in an environment.
  */
-getEnvironmentBindings = \env ->
-    bind(getValue(env), \env#{record} ->
+getEnvironmentBindings = let
+    buildObj := \pairs ->
+        pairs.reduce(
+            \p c -> { p.(c.(0)) = c.(1); return p; },
+            {})
+in \env ->
+    dereference @ env \ env#{record} ->
         ?env instanceof ObjectLexicalEnvironment
-            :compute.bind(getValue(record), \obj -> just(hamt.pairs(obj.properties)))
-            :just(hamt.pairs(record)));
+            :dereference @ record \ obj -> just(obj.properties)
+            :just buildObj(hamt.pairs(record));
 
 /**
  * Get a mapping for the bindings for an environment.
  */
 getEnvironmentOuter = \env ->
-    bind(getValue(env), \{outer} -> just(outer));
+    dereference(env, (.outer) \> just);
 
 /**
  * Get a mapping for the bindings for an environment.
@@ -72,34 +79,19 @@ getEnvironmentBinding = internal_reference.getFrom <<\ environment_ops.getEnviro
 /* Metadata
  ******************************************************************************/
 var _extractMetadata = \f ->
-    execution_context.extract(\ctx ->
-        f(ctx.metadata));
+    extract \ ctx ->
+        f(ctx.metadata);
 
 /**
  * Get the current location.
  */
-location = _extractMetadata(\m -> m.loc);
+location = _extractMetadata (.loc);
 
 /* Stack
  ******************************************************************************/
 /**
  * Get the current stack.
  */
-stack = _extractMetadata(\m -> m.stack);
-
-/**
- * Get a display name for a stack frame.
- */
-getStackFrameName = let
-    anon = string.create('[Anonymous Function]')
-in
-    \frame{func} ->
-        compute.branch(object.hasProperty(func, 'name'),
-            logicalOr(
-                compute.bind(
-                    object.get(func, 'name'),
-                    toString),
-                anon),
-            anon);
+stack = _extractMetadata (.stack);
 
 }

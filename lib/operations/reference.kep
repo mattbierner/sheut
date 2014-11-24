@@ -2,12 +2,15 @@
  * @fileOverview
  */
 package (
-    getFrom,
-    getValue)
+    getFrom
+    getValue
+    dereference)
 with
-    import 'atum/compute' {just},
-    import 'atum/operations/internal_reference' internal_reference,
-    import 'atum/operations/value_reference' value_reference
+    import 'atum::compute' {
+        just
+        bind},
+    import 'atum::operations::internal_reference' internal_reference,
+    import 'atum::operations::value_reference' value_reference
 in {
 
 /* References
@@ -16,14 +19,28 @@ in {
  * Dereference the result of `p` in the compute context from `d`.
  * 
  * @see evaluate
+ * 
+ * @param `p` Computation producing a reference.
  */
-getFrom = internal_reference.getFrom \> value_reference.getFrom;
+getFrom := internal_reference.getFrom \> value_reference.getFrom;
 
 /**
  * Dereference `ref` in the compute context from `d`.
  * 
+ * Noop is `ref` is not a reference.
+ * 
  * @see evaluate
+ * 
+ * @param ref Reference type.
  */
-getValue = just \> getFrom;
+getValue := just \> getFrom;
+
+
+/**
+ * Dereference `ref` and continue execution with the result of `f` called
+ * with the result.
+ */
+dereference := \ref f ->
+    bind(getValue(ref), f);
 
 }

@@ -25,6 +25,8 @@ with
 in {
 
 /**
+ * Stack frame record.
+ * 
  * @member func Reference to function.
  * 
  * @member environment The current environment of the frame. For a function in the
@@ -41,8 +43,6 @@ var Frame := record.declare(null, [
 
 /* Stack
  ******************************************************************************/
-
-
 /**
  * Get the current stack.
  * 
@@ -58,14 +58,14 @@ in
             _stack,
             context.location,
             context.environment),
-        \stack, loc, env -> {
+        \stack loc env -> {
             var out = [];
             var func = null;
             stack.reverse().forEach \ {environment location callee} -> {
                 out.unshift(Frame.create(func, environment, location));
                 func = callee;
             };
-            out.unshift(Frame.create(func, env, loc));
+            out.unshift(Frame.create(func, env, loc)); // Current frame.
             return just(out);
         });
 

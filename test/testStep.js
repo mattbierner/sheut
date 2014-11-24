@@ -102,13 +102,6 @@ function(compute,
                 
                 var d1 = step.sequence(step.step, step.step, step.step)(d);
                 
-                console.log(d1);
-                console.log(run.extract(d1, context.location) + '');
-                var a = run.extract(d1, compute.bind(context.environment, function(env) {
-                    return context.getEnvironmentBindings(env);
-                }));
-                console.log(a);
-
                 assert.equal(
                     run.extract(d1, evaluate.evaluateInput("x")).value,
                     3);
@@ -118,9 +111,7 @@ function(compute,
                     1);
                 
                 var d2 = step.step(d1);
-                console.log(d2);
-                console.log(run.extract(d2, context.location) + '');
-
+              
                 assert.equal(
                     run.extract(d2, evaluate.evaluateInput("x")).value,
                     6);

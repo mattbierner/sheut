@@ -134,7 +134,7 @@ var testDepth := \pred ->
 /**
  * Next depth is greater than current depth.
  */
-depthGt := testDepth((<));
+depthGt := testDepthx((<));
 
 /**
  * Next depth is greater than or equal to current depth.
